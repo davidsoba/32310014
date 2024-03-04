@@ -1,0 +1,93 @@
+---
+title: "Taller 1 - Regresión ridge y lasso"
+subtitle: "Análisis Avanzado de Datos"
+author: "Maestría en Matemáticas Aplicadas y Ciencias de la Computación"
+date: "2024-03-06"
+output: rmdformats::downcute
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Taller 1 - Regresión ridge y lasso
+
+```{r}
+# Librerías
+library(tidyverse)
+library(glmnet)
+```
+
+# Problema
+
+El conjunto de datos `taller1.txt` contiene la información del perfil genómico de un conjunto de 1200 líneas celulares. Para estas se busca determinar cuáles de los 5000 genes (ubicados en cada columna) son de relevancia para la predicción de la variable respuesta (efectividad del tratamiento anticancer, medida como variable continua). Responda las siguientes preguntas:
+
+```{r}
+# Cargar datos
+data <- read_delim("data/taller1.txt", delim = ",")
+```
+
+## Pregunta 1
+
+¿Hay multicolinealidad en los datos?
+
+Hallar multicolinealidad en los datos implica encontrar correlaciones altas entre las variables. No obstante, al contar con 5000 variables, realizar un análisis visual sobre la matriz de correlaciones es inviable, tanto en la tabla que arroja el comando `cor` como un mapa de calor. Por lo tanto, una buena opción para identificar multicolinealidad es buscar aquellas correlaciones superiores a $|0.5|$ que, de acuerdo con la teoría (Montgomety, 2018), se consideran "débiles" y a partir de este umbral identificar relaciones "altas" (superiores a $|0.8|$).
+
+```{r}
+# Filtrar las correlaciones superiores a 0.7
+data %>% 
+  select(-y) %>%
+  cor() %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "var1") %>%
+  gather(var2, value, -var1) %>%
+  mutate(diagonal = (var1 == var2)) %>%
+  filter(diagonal != TRUE,
+         abs(value) > 0.5)
+```
+
+El anterior bloque de código no arrojó ningún valor, lo cual indica que no hay correlaciones superiores a $|0.5|$ entre las 5000 variables que servirán como predictores dentro de los ejercicios que se adelantaran más adelante en este taller. Por lo tanto, no hay multicolinealidad en los datos.
+
+## Pregunta 2
+
+Separe aleatoriamente (pero guarde la semilla) su conjunto de datos en dos partes:
+- Entrenamiento: 1000 líneas celulares
+- Prueba: 200 líneas celulares.
+
+```{r, message=FALSE}
+```
+
+## Pregunta 3
+
+Usando los 1000 datos de entrenamiento, determine los valores de $λr$ y $λl$ de regesión ridge y lasso, respectivamente, que minimicen el error cuadrático medio (ECM) mediante validación externa. Utilice el método de validación externa que considere más apropiado.
+
+```{r}
+```  
+
+## Pregunta 4
+
+Ajuste la regresión ridge y lasso con los valores estimados de $λr$ y $λl$ obtenidos en (3) usando los 1000 datos de entrenamiento.
+
+```{r}
+```
+
+## Pregunta 5
+
+Para los modelos ajustados en (4) determine el más apropiado para propósitos de predicción. Considere únicamente el ECM en los 200 datos de prueba para su decisión.
+
+```{r}
+```
+
+## Pregunta 6
+
+Ajuste el modelo seleccionado en (5) para los 1200 datos. Note que en este punto ya tiene un $λ$ estimado y un modelo seleccionado.
+
+```{r}
+```
+
+## Pregunta 7
+
+Grafique las trazas de los coeficientes en función de la penalización para el modelo ajustado en (6).
+
+```{r}
+```
