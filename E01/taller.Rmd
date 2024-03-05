@@ -69,6 +69,11 @@ Usando los 1000 datos de entrenamiento, determine los valores de $λr$ y $λl$ d
 Ajuste la regresión ridge y lasso con los valores estimados de $λr$ y $λl$ obtenidos en (3) usando los 1000 datos de entrenamiento.
 
 ```{r}
+# Regresión Ridge
+modelo_ridge <- glmnet(X_train, y_train, alpha = 0, lambda = lambda_ridge)
+
+# Regresión Lasso
+modelo_lasso <- glmnet(X_train, y_train, alpha = 1, lambda = lambda_lasso)
 ```
 
 ## Pregunta 5
@@ -76,6 +81,26 @@ Ajuste la regresión ridge y lasso con los valores estimados de $λr$ y $λl$ ob
 Para los modelos ajustados en (4) determine el más apropiado para propósitos de predicción. Considere únicamente el ECM en los 200 datos de prueba para su decisión.
 
 ```{r}
+# Variables del modelo - Prueba
+X_test <- as.matrix(test[, -ncol(test)]) # Variables predictoras de prueba
+y_test <- test$y # variable respuesta de prueba
+
+# Predicciones - Regresión Ridge
+pred_ridge <- predict(modelo_ridge, newx = X_test)
+mse_ridge <- mean((y_test - pred_ridge)^2)
+
+# Predicciones - Regresión Lasso
+pred_lasso <- predict(modelo_lasso, newx = X_test)
+mse_lasso <- mean((y_test - pred_lasso)^2)
+
+# Comparación de ECM
+if (mse_ridge < mse_lasso) {
+  "El modelo de regresión Ridge es más apropiado para propósitos de predicción."
+} else if (mse_ridge > mse_lasso) {
+  "El modelo de regresión Lasso es más apropiado para propósitos de predicción."
+} else {
+  "Ambos modelos tienen un desempeño similar para propósitos de predicción."
+}
 ```
 
 ## Pregunta 6
@@ -83,6 +108,12 @@ Para los modelos ajustados en (4) determine el más apropiado para propósitos d
 Ajuste el modelo seleccionado en (5) para los 1200 datos. Note que en este punto ya tiene un $λ$ estimado y un modelo seleccionado.
 
 ```{r}
+# Variables del modelo - Todos los datos
+X <- as.matrix(data[, -ncol(data)]) # Variables predictoras
+y <- data$y # Variable respuesta
+
+# Ajuste del modelo seleccionado
+modelo <- glmnet(X, y, alpha = 1, lambda = lambda_lasso)
 ```
 
 ## Pregunta 7
@@ -90,4 +121,7 @@ Ajuste el modelo seleccionado en (5) para los 1200 datos. Note que en este punto
 Grafique las trazas de los coeficientes en función de la penalización para el modelo ajustado en (6).
 
 ```{r}
+lambda_val=c(0,log(seq(2,10,length.out=19)))
+modelo <- glmnet(X, y, alpha = 1, lambda = lambda_val)
+plot(modelo, xvar = "lambda")
 ```
