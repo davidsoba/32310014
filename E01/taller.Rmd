@@ -55,6 +55,12 @@ Separe aleatoriamente (pero guarde la semilla) su conjunto de datos en dos parte
 - Prueba: 200 líneas celulares.
 
 ```{r, message=FALSE}
+# Semilla
+set.seed(123)
+
+# Separar datos
+train <- data %>% sample_n(1000)
+test <- data %>% anti_join(train)
 ```
 
 ## Pregunta 3
@@ -62,6 +68,19 @@ Separe aleatoriamente (pero guarde la semilla) su conjunto de datos en dos parte
 Usando los 1000 datos de entrenamiento, determine los valores de $λr$ y $λl$ de regesión ridge y lasso, respectivamente, que minimicen el error cuadrático medio (ECM) mediante validación externa. Utilice el método de validación externa que considere más apropiado.
 
 ```{r}
+# Variables del modelo - Entrenamiento
+X_train <- as.matrix(train[, -ncol(train)]) # Variables predictoras de entrenamiento
+y_train <- train$y # variable respuesta de entrenamiento
+
+# Regresión Ridge
+cv_ridge <- cv.glmnet(X_train, y_train, alpha = 0, type.measure = "mse", nfolds = 10) # Cross-validation para encontrar el mejor lambda
+lambda_ridge <- cv_ridge$lambda.min # Mejor lambda
+lambda_ridge
+
+# Regresión Lasso
+cv_lasso <- cv.glmnet(X_train, y_train, alpha = 1, type.measure = "mse", nfolds = 10) # Cross-validation para encontrar el mejor lambda
+lambda_lasso <- cv_lasso$lambda.min # Mejor lambda
+lambda_lasso
 ```  
 
 ## Pregunta 4
