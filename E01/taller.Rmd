@@ -144,3 +144,9 @@ lambda_val=c(0,log(seq(2,10,length.out=19)))
 modelo <- glmnet(X, y, alpha = 1, lambda = lambda_val)
 plot(modelo, xvar = "lambda")
 ```
+
+## Pregunta 8
+
+En un párrafo resuma los resultados obtenidos dado el objetivo inicial del estudio.
+
+Los resultados de este estudio muestran que los modelos de regresión Ridge y Lasso son herramientas eficaces para predecir la efectividad del tratamiento anticancer en líneas celulares utilizando perfiles genómicos de 5000 genes.Inicialmente, se encontró que no hay evidencias de multicolinealidad entre las variables predictoras, lo que sugiere que los genes seleccionados tienen una baja correlación entre sí. Posteriormente, se dividieron los datos en conjuntos de entrenamiento y prueba y seleccionar los valores óptimos de regularización para los modelos de Ridge y Lasso mediante validación cruzada, se ajustaron los modelos y se evaluaron utilizando el error cuadrático medio en los datos de prueba. Se determinó que el modelo Lasso superó ligeramente al modelo Ridge en términos de capacidad predictiva. Al ajustar el modelo Lasso seleccionado con todos los datos disponibles para identificar los genes más relevantes para la predicción de la efectividad del tratamiento anticancer.Los resultados de este estudio proporcionan información valiosa para comprender la relación entre el perfil genómico y la efectividad del tratamiento, lo que podría ayudar en el desarrollo de terapias más efectivas contra el cáncer.
