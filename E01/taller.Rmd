@@ -31,7 +31,7 @@ data <- read_delim("data/taller1.txt", delim = ",")
 
 ¿Hay multicolinealidad en los datos?
 
-Hallar multicolinealidad en los datos implica encontrar correlaciones altas entre las variables. No obstante, al contar con 5000 variables, realizar un análisis visual sobre la matriz de correlaciones es inviable, tanto en la tabla que arroja el comando `cor` como un mapa de calor. Por lo tanto, una buena opción para identificar multicolinealidad es buscar aquellas correlaciones superiores a $|0.5|$ que, de acuerdo con la teoría (Montgomety, 2018), se consideran "débiles" y a partir de este umbral identificar relaciones "altas" (superiores a $|0.8|$).
+Hallar multicolinealidad en los datos implica encontrar correlaciones altas entre las variables. No obstante, al contar con 5000 variables, realizar un análisis visual sobre la matriz de correlaciones es inviable, tanto en la tabla que arroja el comando `cor` como un mapa de calor. Por lo tanto, una buena opción para identificar multicolinealidad es buscar aquellas correlaciones superiores a $|0.5|$ que, de acuerdo con la teoría (Montgomety, 2018), se consideran "débiles" y a partir de este umbral identificar correlaciones "altas" (superiores a $|0.8|$).
 
 ```{r}
 # Filtrar las correlaciones superiores a 0.7
@@ -46,7 +46,7 @@ data %>%
          abs(value) > 0.5)
 ```
 
-El anterior bloque de código no arrojó ningún valor, lo cual indica que no hay correlaciones superiores a $|0.5|$ entre las 5000 variables que servirán como predictores dentro de los ejercicios que se adelantaran más adelante en este taller. Por lo tanto, no hay multicolinealidad en los datos.
+El anterior bloque de código no arrojó ningún valor, lo cual indica que no hay correlaciones superiores a $|0.5|$ entre las 5000 variables que servirán como predictoras dentro de los ejercicios que se adelantaran más adelante en este taller. Por lo tanto, no hay multicolinealidad en los datos.
 
 ## Pregunta 2
 
