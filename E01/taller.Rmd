@@ -69,7 +69,7 @@ Usando los 1000 datos de entrenamiento, determine los valores de $λr$ y $λl$ d
 
 ```{r}
 # Variables del modelo - Entrenamiento
-X_train <- as.matrix(train[, -ncol(train)]) # Variables predictoras de entrenamiento
+X_train <- as.matrix(train[, -1]) # Variables predictoras de entrenamiento
 y_train <- train$y # variable respuesta de entrenamiento
 
 # Regresión Ridge
@@ -101,7 +101,7 @@ Para los modelos ajustados en (4) determine el más apropiado para propósitos d
 
 ```{r}
 # Variables del modelo - Prueba
-X_test <- as.matrix(test[, -ncol(test)]) # Variables predictoras de prueba
+X_test <- as.matrix(test[, -1]) # Variables predictoras de prueba
 y_test <- test$y # variable respuesta de prueba
 
 # Predicciones - Regresión Ridge
@@ -128,7 +128,7 @@ Ajuste el modelo seleccionado en (5) para los 1200 datos. Note que en este punto
 
 ```{r}
 # Variables del modelo - Todos los datos
-X <- as.matrix(data[, -ncol(data)]) # Variables predictoras
+X <- as.matrix(data[, -1]) # Variables predictoras
 y <- data$y # Variable respuesta
 
 # Ajuste del modelo seleccionado
@@ -140,13 +140,32 @@ modelo <- glmnet(X, y, alpha = 1, lambda = lambda_lasso)
 Grafique las trazas de los coeficientes en función de la penalización para el modelo ajustado en (6).
 
 ```{r}
-lambda_val=c(0,log(seq(2,10,length.out=19)))
-modelo <- glmnet(X, y, alpha = 1, lambda = lambda_val)
+#lambda_val=c(0,log(seq(2,10,length.out=19)))
+modelo <- glmnet(X, y, alpha = 1, lambda = lambda_lasso)
 plot(modelo, xvar = "lambda")
+```
+
+```{r, fig.width=10, fig.height=10}
+# Coeficientes
+coefs <- coef(modelo, s=0)
+ 
+# Dataframe
+coefs_df <- data.frame(variable = rownames(coefs), coeficiente = as.vector(coefs)) %>%
+  mutate(signo = ifelse(coeficiente > 0, "Positivo", "Negativo")) %>%
+  filter(coeficiente != 0)
+
+# Gráfico
+ggplot(coefs_df, aes(x = coeficiente, y = reorder(variable, coeficiente), fill = signo)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Trazas de coeficientes en función de la penalización",
+       x = "Valor del coeficiente",
+       y = "Variable") +
+  theme(legend.position = "bottom") +
+  scale_fill_manual(values = c("Positivo" = "blue", "Negativo" = "red"))
 ```
 
 ## Pregunta 8
 
 En un párrafo resuma los resultados obtenidos dado el objetivo inicial del estudio.
 
-Los resultados de este estudio muestran que los modelos de regresión Ridge y Lasso son herramientas eficaces para predecir la efectividad del tratamiento anticancer en líneas celulares utilizando perfiles genómicos de 5000 genes.Inicialmente, se encontró que no hay evidencias de multicolinealidad entre las variables predictoras, lo que sugiere que los genes seleccionados tienen una baja correlación entre sí. Posteriormente, se dividieron los datos en conjuntos de entrenamiento y prueba y seleccionar los valores óptimos de regularización para los modelos de Ridge y Lasso mediante validación cruzada, se ajustaron los modelos y se evaluaron utilizando el error cuadrático medio en los datos de prueba. Se determinó que el modelo Lasso superó ligeramente al modelo Ridge en términos de capacidad predictiva. Al ajustar el modelo Lasso seleccionado con todos los datos disponibles para identificar los genes más relevantes para la predicción de la efectividad del tratamiento anticancer.Los resultados de este estudio proporcionan información valiosa para comprender la relación entre el perfil genómico y la efectividad del tratamiento, lo que podría ayudar en el desarrollo de terapias más efectivas contra el cáncer.
+Los resultados de este estudio muestran que los modelos de regresión Ridge y Lasso son herramientas eficaces para predecir la efectividad del tratamiento anticancer en líneas celulares utilizando perfiles genómicos de 5000 genes. Inicialmente, se encontró que no hay evidencias de multicolinealidad entre las variables predictoras, lo que sugiere que los genes seleccionados tienen una baja correlación entre sí. Posteriormente, se dividieron los datos en conjuntos de entrenamiento y prueba y se seleccionaron los valores óptimos de regularización para los modelos de Ridge y Lasso mediante validación cruzada. Se ajustaron los modelos y se evaluaron utilizando el error cuadrático medio en los datos de prueba, determinando que el modelo Lasso superó ligeramente al modelo Ridge en términos de capacidad predictiva.
