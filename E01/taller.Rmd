@@ -118,7 +118,7 @@ mse_lasso <- mean((y_test - pred_lasso)^2)
 mse_lasso
 ```
 
-Basado en el ECM en los 200 datos de prueba, se determina que el modelo de regresión Lasso (`r mse_lasso`) es más apropiado para propósitos de predicción en comparación con el modelo de regresión Ridge (`r mse_lasso`).
+Basado en el ECM en los 200 datos de prueba, se determina que el modelo de regresión Lasso (`r mse_lasso`) es más apropiado para propósitos de predicción en comparación con el modelo de regresión Ridge (`r mse_ridge`).
 
 ## Pregunta 6
 
