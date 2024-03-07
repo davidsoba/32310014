@@ -4,6 +4,8 @@ subtitle: "Análisis Avanzado de Datos"
 author: "Maestría en Matemáticas Aplicadas y Ciencias de la Computación"
 date: "2024-03-06"
 output: rmdformats::downcute
+bibliography: referencias.bib
+link-citations: true
 ---
 
 ```{r setup, include=FALSE}
@@ -31,7 +33,7 @@ data <- read_delim("data/taller1.txt", delim = ",")
 
 ¿Hay multicolinealidad en los datos?
 
-Hallar multicolinealidad en los datos implica encontrar correlaciones altas entre las variables. No obstante, al contar con 5000 variables, realizar un análisis visual sobre la matriz de correlaciones es inviable, tanto en la tabla que arroja el comando `cor` como un mapa de calor. Por lo tanto, una buena opción para identificar multicolinealidad es buscar aquellas correlaciones superiores a $|0.5|$ que, de acuerdo con la teoría (Montgomety, 2018), se consideran "débiles" y a partir de este umbral identificar correlaciones "altas" (superiores a $|0.8|$).
+Hallar multicolinealidad en los datos implica encontrar correlaciones altas entre las variables. No obstante, al contar con 5000 variables, realizar un análisis visual sobre la matriz de correlaciones es inviable, tanto en la tabla que arroja el comando `cor` como un mapa de calor. Por lo tanto, una buena opción para identificar multicolinealidad es buscar aquellas correlaciones superiores a $|0.5|$ que, de acuerdo con la teoría [@bib01], se consideran "débiles" y a partir de este umbral identificar correlaciones "altas" (superiores a $|0.8|$).
 
 ```{r}
 # Filtrar las correlaciones superiores a 0.7
@@ -169,3 +171,5 @@ ggplot(coefs_df, aes(x = coeficiente, y = reorder(variable, coeficiente), fill =
 En un párrafo resuma los resultados obtenidos dado el objetivo inicial del estudio.
 
 Los resultados de este estudio muestran que los modelos de regresión Ridge y Lasso son herramientas eficaces para predecir la efectividad del tratamiento anticancer en líneas celulares utilizando perfiles genómicos de 5000 genes. Inicialmente, se encontró que no hay evidencias de multicolinealidad entre las variables predictoras, lo que sugiere que los genes seleccionados tienen una baja correlación entre sí. Posteriormente, se dividieron los datos en conjuntos de entrenamiento y prueba y se seleccionaron los valores óptimos de regularización para los modelos de Ridge y Lasso mediante validación cruzada. Se ajustaron los modelos y se evaluaron utilizando el error cuadrático medio en los datos de prueba, determinando que el modelo Lasso superó ligeramente al modelo Ridge en términos de capacidad predictiva.
+
+# Referencias
