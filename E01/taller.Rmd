@@ -150,6 +150,9 @@ Grafique las trazas de los coeficientes en función de la penalización para el 
 modelo <- glmnet(X, y, alpha = 1, lambda = lambda_lasso)
 plot(modelo, xvar = "lambda")
 ```
+Al ajustar el modelo a un solo valor de lambda (`r lambda_lasso`) no se puede observar la traza de los coeficientes en función de la penalización. El gráfico de trayectoria de coeficientes es útil cuando se ajusta el modelo para una secuencia de valores de lambda, como en los ejemplos de clase [@bib02] a través de la siguiente línea de código: `lambda_val=c(0,log(seq(2,10,length.out=19)))`.
+
+En cambio, se presenta a continuación un gráfico de barras que muestra los coeficientes para las variables del modelo Lasso, diferentes de 0, en función de su signo:
 
 ```{r, fig.width=10, fig.height=10}
 # Coeficientes
@@ -163,7 +166,7 @@ coefs_df <- data.frame(variable = rownames(coefs), coeficiente = as.vector(coefs
 # Gráfico
 ggplot(coefs_df, aes(x = coeficiente, y = reorder(variable, coeficiente), fill = signo)) +
   geom_bar(stat = "identity", position = "dodge") +
-  labs(title = "Trazas de coeficientes en función de la penalización",
+  labs(title = "Coeficientes del modelo Lasso",
        x = "Valor del coeficiente",
        y = "Variable") +
   theme(legend.position = "bottom") +
