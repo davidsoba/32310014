@@ -85,6 +85,8 @@ lambda_lasso <- cv_lasso$lambda.min # Mejor lambda
 lambda_lasso
 ```  
 
+Los valores óptimos de $λr$ y $λl$ para la regresión Ridge y Lasso, respectivamente, que minimizan el error cuadrático medio (ECM) mediante validación externa utilizando los 1000 datos de entrenamiento son $12.85042$ y $0.07526521$. Estos valores fueron seleccionados a través de la técnica de validación cruzada con 10 folds.
+
 ## Pregunta 4
 
 Ajuste la regresión ridge y lasso con los valores estimados de $λr$ y $λl$ obtenidos en (3) usando los 1000 datos de entrenamiento.
@@ -123,6 +125,8 @@ if (mse_ridge < mse_lasso) {
   "Ambos modelos tienen un desempeño similar para propósitos de predicción."
 }
 ```
+
+Basado en el ECM en los 200 datos de prueba, se determina que el modelo de regresión Lasso es más apropiado para propósitos de predicción en comparación con el modelo de regresión Ridge.
 
 ## Pregunta 6
 
@@ -170,6 +174,6 @@ ggplot(coefs_df, aes(x = coeficiente, y = reorder(variable, coeficiente), fill =
 
 En un párrafo resuma los resultados obtenidos dado el objetivo inicial del estudio.
 
-Los resultados de este estudio muestran que los modelos de regresión Ridge y Lasso son herramientas eficaces para predecir la efectividad del tratamiento anticancer en líneas celulares utilizando perfiles genómicos de 5000 genes. Inicialmente, se encontró que no hay evidencias de multicolinealidad entre las variables predictoras, lo que sugiere que los genes seleccionados tienen una baja correlación entre sí. Posteriormente, se dividieron los datos en conjuntos de entrenamiento y prueba y se seleccionaron los valores óptimos de regularización para los modelos de Ridge y Lasso mediante validación cruzada. Se ajustaron los modelos y se evaluaron utilizando el error cuadrático medio en los datos de prueba, determinando que el modelo Lasso superó ligeramente al modelo Ridge en términos de capacidad predictiva.
+Los resultados de este estudio muestran que los modelos de regresión Ridge y Lasso son herramientas eficaces para predecir la efectividad del tratamiento anticancer en líneas celulares utilizando perfiles genómicos de 5000 genes. Inicialmente, se encontró que no hay evidencias de multicolinealidad entre las variables predictoras, lo que sugiere que los genes seleccionados tienen una baja correlación entre sí. Posteriormente, se dividieron los datos en conjuntos de entrenamiento y prueba, y se seleccionaron los valores óptimos de regularización para los modelos de Ridge y Lasso mediante validación cruzada. Los modelos ajustados fueron evaluados utilizando el error cuadrático medio en los datos de prueba, determinando que el modelo Lasso superó ligeramente al modelo Ridge en términos de capacidad predictiva.
 
 # Referencias
