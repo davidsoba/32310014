@@ -1,7 +1,7 @@
 ---
-title: "Taller 1 - Regresión ridge y lasso"
+title: "Taller 1 - Regresión Ridge y Lasso"
 subtitle: "Análisis Avanzado de Datos"
-author: "Maestría en Matemáticas Aplicadas y Ciencias de la Computación"
+author: "Geraldine Home Senz - Jose David Soba Loaiza"
 date: "2024-03-06"
 output: rmdformats::downcute
 bibliography: referencias.bib
@@ -12,9 +12,9 @@ link-citations: true
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Taller 1 - Regresión ridge y lasso
+# Taller 1
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 # Librerías
 library(tidyverse)
 library(glmnet)
@@ -24,9 +24,10 @@ library(glmnet)
 
 El conjunto de datos `taller1.txt` contiene la información del perfil genómico de un conjunto de 1200 líneas celulares. Para estas se busca determinar cuáles de los 5000 genes (ubicados en cada columna) son de relevancia para la predicción de la variable respuesta (efectividad del tratamiento anticancer, medida como variable continua). Responda las siguientes preguntas:
 
-```{r}
+```{r, message=FALSE}
 # Cargar datos
 data <- read_delim("data/taller1.txt", delim = ",")
+head(data)
 ```
 
 ## Pregunta 1
@@ -67,7 +68,7 @@ test <- data %>% anti_join(train)
 
 ## Pregunta 3
 
-Usando los 1000 datos de entrenamiento, determine los valores de $λr$ y $λl$ de regesión ridge y lasso, respectivamente, que minimicen el error cuadrático medio (ECM) mediante validación externa. Utilice el método de validación externa que considere más apropiado.
+Usando los 1000 datos de entrenamiento, determine los valores de $λr$ y $λl$ de regesión Ridge y Lasso, respectivamente, que minimicen el error cuadrático medio (ECM) mediante validación externa. Utilice el método de validación externa que considere más apropiado.
 
 ```{r}
 # Variables del modelo - Entrenamiento
@@ -85,11 +86,11 @@ lambda_lasso <- cv_lasso$lambda.min # Mejor lambda
 lambda_lasso
 ```  
 
-Los valores óptimos de $λr$ y $λl$ para la regresión Ridge y Lasso, respectivamente, que minimizan el error cuadrático medio (ECM) mediante validación externa utilizando los 1000 datos de entrenamiento son $12.85042$ y $0.07526521$. Estos valores fueron seleccionados a través de la técnica de validación cruzada con 10 folds.
+Los valores óptimos de $λr$ y $λl$ para la regresión Ridge y Lasso, respectivamente, que minimizan el error cuadrático medio (ECM) mediante validación externa utilizando los 1000 datos de entrenamiento son `r lambda_ridge` y `r lambda_lasso`. Estos valores fueron seleccionados a través de la técnica de validación cruzada con 10 *folds*.
 
 ## Pregunta 4
 
-Ajuste la regresión ridge y lasso con los valores estimados de $λr$ y $λl$ obtenidos en (3) usando los 1000 datos de entrenamiento.
+Ajuste la regresión Ridge y Lasso con los valores estimados de $λr$ y $λl$ obtenidos en (3) usando los 1000 datos de entrenamiento.
 
 ```{r}
 # Regresión Ridge
@@ -111,22 +112,15 @@ y_test <- test$y # variable respuesta de prueba
 # Predicciones - Regresión Ridge
 pred_ridge <- predict(modelo_ridge, newx = X_test)
 mse_ridge <- mean((y_test - pred_ridge)^2)
+mse_ridge
 
 # Predicciones - Regresión Lasso
 pred_lasso <- predict(modelo_lasso, newx = X_test)
 mse_lasso <- mean((y_test - pred_lasso)^2)
-
-# Comparación de ECM
-if (mse_ridge < mse_lasso) {
-  "El modelo de regresión Ridge es más apropiado para propósitos de predicción."
-} else if (mse_ridge > mse_lasso) {
-  "El modelo de regresión Lasso es más apropiado para propósitos de predicción."
-} else {
-  "Ambos modelos tienen un desempeño similar para propósitos de predicción."
-}
+mse_lasso
 ```
 
-Basado en el ECM en los 200 datos de prueba, se determina que el modelo de regresión Lasso es más apropiado para propósitos de predicción en comparación con el modelo de regresión Ridge.
+Basado en el ECM en los 200 datos de prueba, se determina que el modelo de regresión Lasso (`r mse_lasso`) es más apropiado para propósitos de predicción en comparación con el modelo de regresión Ridge (`r mse_lasso`).
 
 ## Pregunta 6
 
@@ -150,9 +144,10 @@ Grafique las trazas de los coeficientes en función de la penalización para el 
 modelo <- glmnet(X, y, alpha = 1, lambda = lambda_lasso)
 plot(modelo, xvar = "lambda")
 ```
+
 Al ajustar el modelo a un solo valor de lambda (`r lambda_lasso`) no se puede observar la traza de los coeficientes en función de la penalización. El gráfico de trayectoria de coeficientes es útil cuando se ajusta el modelo para una secuencia de valores de lambda, como en los ejemplos de clase [@bib02] a través de la siguiente línea de código: `lambda_val=c(0,log(seq(2,10,length.out=19)))`.
 
-En cambio, se presenta a continuación un gráfico de barras que muestra los coeficientes para las variables del modelo Lasso, diferentes de 0, en función de su signo:
+En cambio, se presenta a continuación un gráfico de barras que muestra los coeficientes para las variables del modelo Lasso (diferentes de 0) en función de su signo:
 
 ```{r, fig.width=10, fig.height=10}
 # Coeficientes
