@@ -12,8 +12,6 @@ link-citations: true
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Taller 1
-
 ```{r, message=FALSE, warning=FALSE}
 # Librerías
 library(tidyverse)
