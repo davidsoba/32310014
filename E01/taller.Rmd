@@ -1,7 +1,7 @@
 ---
 title: "Taller 1 - Regresión Ridge y Lasso"
 subtitle: "Análisis Avanzado de Datos"
-author: "Geraldine Home Senz - Jose David Soba Loaiza"
+author: "Geraldine Home Saenz - Jose David Soba Loaiza"
 date: "2024-03-06"
 output: rmdformats::downcute
 bibliography: referencias.bib
