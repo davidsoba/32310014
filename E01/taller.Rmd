@@ -52,6 +52,7 @@ El anterior bloque de código no arrojó ningún valor, lo cual indica que no ha
 ## Pregunta 2
 
 Separe aleatoriamente (pero guarde la semilla) su conjunto de datos en dos partes:
+
 - Entrenamiento: 1000 líneas celulares
 - Prueba: 200 líneas celulares.
 
