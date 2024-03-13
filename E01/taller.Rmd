@@ -169,7 +169,7 @@ ggplot(coefs_df, aes(x = coeficiente, y = reorder(variable, coeficiente), fill =
 
 ## Pregunta 8
 
-En un párrafo resuma los resultados obtenidos dado el objetivo inicial del estudio.
+En un párrafo resuma los resultados obtenidos dado el objetivo inicial del estudio
 
 Los resultados de este estudio muestran que los modelos de regresión Ridge y Lasso son herramientas eficaces para predecir la efectividad del tratamiento anticancer en líneas celulares utilizando perfiles genómicos de 5000 genes. Inicialmente, se encontró que no hay evidencias de multicolinealidad entre las variables predictoras, lo que sugiere que los genes seleccionados tienen una baja correlación entre sí. Posteriormente, se dividieron los datos en conjuntos de entrenamiento y prueba, y se seleccionaron los valores óptimos de regularización para los modelos de Ridge y Lasso mediante validación cruzada. Los modelos ajustados fueron evaluados utilizando el error cuadrático medio en los datos de prueba, determinando que el modelo Lasso superó ligeramente al modelo Ridge en términos de capacidad predictiva.
 
