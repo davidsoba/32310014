@@ -240,3 +240,7 @@ Después de ajustar los modelos y calcular el ECM en el conjunto de entrenamient
  - El modelo de `polinomio global de grado 2`, el ECM de prueba es aproximadamente 18.75.
  
 Basándonos en el ECM de prueba, el mejor modelo sería *el mejor modelo basado en base de funciones*, es decir, la regresión spline óptima. Este modelo proporciona el menor error de predicción en el conjunto de prueba.
+
+## Pregunta 6
+
+Repita (1)-(5) un total de 10 veces de manera que en el paso (1) conforme una nueva muestra de validación cruzada, esto le permitirá obtener 10 ECM de prueba para cada paradigma de modelamiento. Grafique las tres distribuciones del ECM de prueba y responda ¿Cuál acercamiento seleccionaría basado en el ECM de predición: basado en base de funciones, basado en regresión local o polinomial global?.
