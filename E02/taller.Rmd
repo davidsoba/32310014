@@ -19,7 +19,7 @@ library(ISLR2)
 library(splines)
 ```
 
-# Problema
+# Problema 1
 
 El conjunto de datos Auto en la librería `ISLR2`, utilizado en clase, contiene la información del rendimiento y otras variables para un total de 392 vehículos. Como nos dimos cuenta, la relación entre dos de sus variables (`horsepower` y `mpg`) es resumida de manera parsimoniosa mediante un polinomio global de grado 2, sin embargo un *spline* suavizado (*smoothing spline*) parece dar un menor error de predicción. Por otra parte, determinar la ubicación y cantidad de *knots* en el *spline* de regresión (*regression spline*) fue un problema que desincentivó su uso. El método de validación externa utilizado para comparar los modelos fue **validación regular**.
  
@@ -87,6 +87,9 @@ fold_opt
 knot_opt <- which.min(mse[, fold_opt])
 knot_opt
 ```
+Para determinar el número óptimo de knots para el problema de regresión spline mediante validación cruzada en 10 folds, realizamos ajustes de modelos para cada valor de knots (de 1 a 10) y evaluamos su rendimiento en términos de error cuadrático medio (ECM) en el conjunto de prueba. Luego, calculamos el promedio de los ECM por cada fold. 
+
+El fold óptimo es el número 8, y el knot óptimo que minimiza el ECM es también 8. Esto implica que el modelo con 8 knots resulta en el menor ECM de predicción según la validación cruzada en 10 folds. Lo que significa que utilizar 8 knots en el modelo de regresión spline proporciona el mejor ajuste a los datos de entrenamiento. 
 
 ## Pregunta 3
 
@@ -134,6 +137,13 @@ best_model <- which.min(mse_mean)
 best_model
 ```
 
+Después de realizar la validación curazada en 10 folds y calcular los ECM para cada uno de los tres modelos, los resultados son los siguientes:
+ - Para el `modelo de polinomio grado 2 global`, el ECM promedio es aproximadamente 18.75.
+ - Para el `modelo de spline suavizado`, el ECM promedio es aproximadamente 128.50.
+ - Para el `modelo de regresión spline óptimo`, el ECM promedio es aproximadamente 18.04.
+
+Basándonos en el ECM de predicción, el modelo seleccionado sería el *modelo de regresión spline óptimo*, ya que tiene el menor ECM promedio entre los tres modelos evaluados.
+
 ## Pregunta 4
 
 **Usando los datos de entrenamiento, determine el mejor modelo basado en regresión local**. Determine la regresión polinomial local con kernel gaussiano que resulte en menor error de predicción: regresión de grado 1 o 2. Use el ancho de banda óptimo dado por defecto por la función `loess()`.
@@ -173,6 +183,12 @@ mse_mean
 best_model <- which.min(mse_mean)
 best_model
 ```
+
+Luego de ajustar los `modelos de regresión local de grado 1 y grado 2`, y realizar la validación cruzada en 10 folds para cada uno, los resultados son los siguientes:
+ - Para la `regresión local de grado 1`, el ECM promedio es aproximadamente 18.64.
+ - Para la `regresión local de grado 2`, el ECM promedio es aproximadamente 18.20.
+ 
+Basándonos en el ECM de predicción, el modelo seleccionado sería la *regresión local de grado 2*, ya que tiene un ECM promedio ligeramente menor que la regresión local de grado 1. 
 
 ## Pregunta 5
 
@@ -218,3 +234,9 @@ best_model <- which.min(mse_mean)
 best_model
 ```
 
+Después de ajustar los modelos y calcular el ECM en el conjunto de entrenamiento y de prueba para cada uno, los resultados son los siguientes:
+ - El mejor modelo basado en `base de funciones` (regresión spline óptima), el ECM de prueba es aproximadamente 18.04.
+ - El mejor modelo basado en `regresión local` (regresión local de grado 2), el ECM de prueba es aproximadamente 18.20.
+ - El modelo de `polinomio global de grado 2`, el ECM de prueba es aproximadamente 18.75.
+ 
+Basándonos en el ECM de prueba, el mejor modelo sería *el mejor modelo basado en base de funciones*, es decir, la regresión spline óptima. Este modelo proporciona el menor error de predicción en el conjunto de prueba.
