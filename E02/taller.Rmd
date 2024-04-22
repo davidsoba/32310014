@@ -87,9 +87,8 @@ fold_opt
 knot_opt <- which.min(mse[, fold_opt])
 knot_opt
 ```
-Para determinar el número óptimo de knots para el problema de regresión spline mediante validación cruzada en 10 folds, realizamos ajustes de modelos para cada valor de knots (de 1 a 10) y evaluamos su rendimiento en términos de error cuadrático medio (ECM) en el conjunto de prueba. Luego, calculamos el promedio de los ECM por cada fold. 
 
-El fold óptimo es el número 8, y el knot óptimo que minimiza el ECM es también 8. Esto implica que el modelo con 8 knots resulta en el menor ECM de predicción según la validación cruzada en 10 folds. Lo que significa que utilizar 8 knots en el modelo de regresión spline proporciona el mejor ajuste a los datos de entrenamiento. 
+Para determinar el número óptimo de *knots* para el problema de regresión *spline* mediante validación cruzada en 10 *folds*, se realizaron ajustes de modelos para cada valor de *knots* (de 1 a 10) y se evaluó su rendimiento en términos de error cuadrático medio (ECM) en el conjunto de prueba. Luego, se calculó el promedio de los ECM por cada *fold*. **El *fold* óptimo es el número 8, y el *knot* óptimo que minimiza el ECM es el 8, también**. Esto implica que el modelo con 8 *knots* resulta en el menor ECM de predicción según la validación cruzada en 10 *folds*. 
 
 ## Pregunta 3
 
@@ -137,10 +136,11 @@ best_model <- which.min(mse_mean)
 best_model
 ```
 
-Después de realizar la validación curazada en 10 folds y calcular los ECM para cada uno de los tres modelos, los resultados son los siguientes:
- - Para el `modelo de polinomio grado 2 global`, el ECM promedio es aproximadamente 18.75.
- - Para el `modelo de spline suavizado`, el ECM promedio es aproximadamente 128.50.
- - Para el `modelo de regresión spline óptimo`, el ECM promedio es aproximadamente 18.04.
+Después de realizar la validación cruzada en 10 *folds* y calcular los ECM para cada uno de los tres modelos, los resultados son los siguientes:
+
+ - Para el **modelo de polinomio grado 2 global**, el ECM promedio es aproximadamente 18.75.
+ - Para el **modelo de spline suavizado**, el ECM promedio es aproximadamente 128.50.
+ - Para el **modelo de regresión spline óptimo**, el ECM promedio es aproximadamente 18.04.
 
 Basándonos en el ECM de predicción, el modelo seleccionado sería el *modelo de regresión spline óptimo*, ya que tiene el menor ECM promedio entre los tres modelos evaluados.
 
@@ -184,17 +184,18 @@ best_model <- which.min(mse_mean)
 best_model
 ```
 
-Luego de ajustar los `modelos de regresión local de grado 1 y grado 2`, y realizar la validación cruzada en 10 folds para cada uno, los resultados son los siguientes:
- - Para la `regresión local de grado 1`, el ECM promedio es aproximadamente 18.64.
- - Para la `regresión local de grado 2`, el ECM promedio es aproximadamente 18.20.
+Luego de ajustar los *modelos de regresión local de grado 1 y grado 2*, y realizar la validación cruzada en 10 *folds* para cada uno, los resultados son los siguientes:
+
+ - Para la **regresión local de grado 1**, el ECM promedio es aproximadamente 18.64.
+ - Para la **regresión local de grado 2**, el ECM promedio es aproximadamente 18.20.
  
-Basándonos en el ECM de predicción, el modelo seleccionado sería la *regresión local de grado 2*, ya que tiene un ECM promedio ligeramente menor que la regresión local de grado 1. 
+Basándonos en el ECM de predicción, el modelo seleccionado sería la **regresión local de grado 2**, ya que tiene un ECM promedio ligeramente menor que la regresión local de grado 1. 
 
 ## Pregunta 5
 
 **Usando los datos de entrenamiento y de prueba, determine el mejor de los tres paradigmas de modelamiento**. Ajuste el mejor modelo basado en base de funciones, el mejor modelo basado en regresión local y un polinomio global de grado dos con los datos de entrenamiento y calcule el ECM de prueba para cada modelo.
 
-```{r}
+```{r, message=FALSE}
 # Ajuste de modelos
 set.seed(123)
 
@@ -235,12 +236,88 @@ best_model
 ```
 
 Después de ajustar los modelos y calcular el ECM en el conjunto de entrenamiento y de prueba para cada uno, los resultados son los siguientes:
- - El mejor modelo basado en `base de funciones` (regresión spline óptima), el ECM de prueba es aproximadamente 18.04.
- - El mejor modelo basado en `regresión local` (regresión local de grado 2), el ECM de prueba es aproximadamente 18.20.
- - El modelo de `polinomio global de grado 2`, el ECM de prueba es aproximadamente 18.75.
+
+ - El mejor modelo basado en **base de funciones** (regresión *spline* óptima), el ECM de prueba es aproximadamente 18.04.
+ - El mejor modelo basado en **regresión local** (regresión local de grado 2), el ECM de prueba es aproximadamente 18.20.
+ - El modelo de **polinomio global de grado 2**, el ECM de prueba es aproximadamente 18.75.
  
-Basándonos en el ECM de prueba, el mejor modelo sería *el mejor modelo basado en base de funciones*, es decir, la regresión spline óptima. Este modelo proporciona el menor error de predicción en el conjunto de prueba.
+Basándonos en el ECM de prueba, el mejor modelo sería *el mejor modelo basado en base de funciones*, es decir, la regresión *spline* óptima. Este modelo proporciona el menor error de predicción en el conjunto de prueba.
 
 ## Pregunta 6
 
 Repita (1)-(5) un total de 10 veces de manera que en el paso (1) conforme una nueva muestra de validación cruzada, esto le permitirá obtener 10 ECM de prueba para cada paradigma de modelamiento. Grafique las tres distribuciones del ECM de prueba y responda ¿Cuál acercamiento seleccionaría basado en el ECM de predición: basado en base de funciones, basado en regresión local o polinomial global?.
+
+```{r, message=FALSE}
+# Función para ajustar modelos y calcular el ECM
+aproach <- function(Auto, num_iter = 10) {
+
+  # Vectores de almacenamiento
+  mse_base_func <- numeric(num_iter)
+  mse_local_reg <- numeric(num_iter)
+  mse_glob_poly <- numeric(num_iter)
+
+  # Iteraciones
+  for (i in 1:num_iter) {
+    set.seed(i)
+    train_idx <- sample.int(nrow(Auto), 0.9 * nrow(Auto))
+    test_idx <- seq(nrow(Auto))[!seq(nrow(Auto)) %in% train_idx]
+    train <- Auto[train_idx, ]
+    test <- Auto[test_idx, ]
+
+    # Ajuste de modelos
+    model_base_func <- lm(mpg ~ bs(horsepower, df = knot_opt, Boundary.knots = range(Auto$horsepower) + c(-5, +5)), data = train)
+    model_local_reg <- loess(mpg ~ horsepower, degree = 2, data = train)
+    model_glob_poly <- lm(mpg ~ poly(horsepower, 2), data = train)
+
+    # Predicciones
+    pred_base_func <- predict(model_base_func, newdata = test)
+    pred_local_reg <- predict(model_local_reg, newdata = test)
+    pred_glob_poly <- predict(model_glob_poly, newdata = test)
+
+    # Error cuadrático medio
+    mse_base_func[i] <- mean((test$mpg - pred_base_func)^2)
+    mse_local_reg[i] <- mean((test$mpg - pred_local_reg)^2)
+    mse_glob_poly[i] <- mean((test$mpg - pred_glob_poly)^2)
+  }
+
+  # Gráfico de la distribución del ECM de prueba en ggplot2
+  df <- data.frame(
+    mse = c(mse_base_func, mse_local_reg, mse_glob_poly),
+    model = rep(c("Base de funciones", "Regresión local", "Polinomio global"), each = num_iter)) %>%
+    mutate(model = factor(model, levels = c("Base de funciones", "Regresión local", "Polinomio global"))) %>%
+    ggplot(aes(x = model, y = mse, fill = model)) +
+    geom_boxplot(width = 0.2, color = "#2F4F4F", fill = "white") +
+    geom_jitter(width = 0.1, alpha = 0.2) +
+    labs(x = "Modelo", y = "ECM de prueba", title = "Comparación de acercamientos") +
+    theme(legend.position = "none")
+
+  print(df)
+
+}
+
+# Repetición de los pasos
+set.seed(123)
+aproach(Auto, 10)
+```
+
+# Problema 2
+## Pregunta 7
+
+En el contexto de análisis de datos funcionales se tiene una colección finita de observaciones ruidosas, donde para cada individuo, estas se asumen provenientes de una curva de dimensión infinita la cual es evaluada en puntos de un intervalo determinado. Para la i-ésima unidad estadística se tiene un conjunto de $n_i$ observaciones discretizadas $x_{i1},\dots,x_{ij},\dots,x_{in_i}$ de la función $x_i$ en los puntos $t_{i1}, \dots, t_{ij} , \dots, t_{in_i}$ con $x_{ij} \in R, t_{ij} \in T$ y $T$ un intervalo que representa el dominio sobre los reales donde se definen los datos funcionales.
+
+**Escriba el estimador de Nadaraya–Watson para la i-ésima unidad estadística en $t$, es decir, $x(t)$**
+
+$$\hat{x_i}(t) = \frac{\sum_{j=1}^{n_i} K\left(\frac{t-t_{ij}}{h}\right)x_{ij}}{\sum_{j=1}^{n_i} K\left(\frac{t-t_{ij}}{h}\right)}$$
+Donde:
+
+
+
+## Pregunta 8
+
+La centralidad de los datos funcionales se resume en la función media $µ$, la cual puede interpretarse en cada valor $t \in T$ como el valor promedio de la función aleatoria subyacente en $t, µ(t)$. Fíjese que el estimador de Nadarya–Watson puede extenderse a más de una unidad estadística, resultando en $t$ como un promedio ponderado de las observaciones cercanas para todas las observaciones $x_{ij}$:
+
+**Escriba el estimador de Nadaraya–Watson para la función media en $t$, es decir, $\hat{\mu}(t)$. Note que todos los datos discretizados son utilizados en la estimación de la función media**
+
+$$\hat{\mu}(t) = \frac{\sum_{i=1}^N \sum_{j=1}^{n_i} K\left(\frac{t-t_{ij}}{h}\right)x_{ij}}{\sum_{i=1}^N \sum_{j=1}^{n_i} K\left(\frac{t-t_{ij}}{h}\right)}$$
+Donde:
+
