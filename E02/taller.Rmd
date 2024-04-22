@@ -1,0 +1,220 @@
+---
+title: "Taller 2 - Splines de Regresión y Regresión Local"
+subtitle: "Análisis Avanzado de Datos"
+author: "Geraldine Home Saenz - Jose David Soba Loaiza"
+date: "2024-04-24"
+output: rmdformats::downcute
+# bibliography: referencias.bib
+# link-citations: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE, warning=FALSE}
+# Librerías
+library(tidyverse)
+library(ISLR2)
+library(splines)
+```
+
+# Problema
+
+El conjunto de datos Auto en la librería `ISLR2`, utilizado en clase, contiene la información del rendimiento y otras variables para un total de 392 vehículos. Como nos dimos cuenta, la relación entre dos de sus variables (`horsepower` y `mpg`) es resumida de manera parsimoniosa mediante un polinomio global de grado 2, sin embargo un *spline* suavizado (*smoothing spline*) parece dar un menor error de predicción. Por otra parte, determinar la ubicación y cantidad de *knots* en el *spline* de regresión (*regression spline*) fue un problema que desincentivó su uso. El método de validación externa utilizado para comparar los modelos fue **validación regular**.
+ 
+## Pregunta 1
+
+Separe aleatoriamente (pero guarde la semilla) su conjunto de datos en dos partes:
+- Entrenamiento: 90% de los autos
+- Prueba: 10% de los autos.
+
+```{r, message=FALSE}
+# Semilla
+set.seed(123)
+
+# Conjuntos de entrenamiento y prueba
+Auto <- Auto
+sample_size <- nrow(Auto)
+train <- sample(sample_size, 0.9 * sample_size)
+test <- seq(sample_size)[!seq(sample_size) %in% train]
+```
+
+## Pregunta 2
+
+**Usando los datos de entrenamiento** Mediante validación cruzada en 10 *folds*, determine el número óptimo de *knots* para el problema de regresión *spline*. Considere como número de posible de *knots* 1,...,10, igualmente espaciados en el rango de la variable `horsepower`. ¿Qué modelo (es decir, cual valor de *knot* con k = 1,...,10) resulta en un menor ECM de predicción?
+
+**Ayudas:**
+- Puede ser conveniente definir los folds de manera aleatoria como `sample(1:10,n,replace=TRUE)` para facilitar la validación cruzada.
+
+- Tiene que ajustar en cada fold los 10 posibles knots, y probar su error en el conjunto de prueba. Por lo tal, tendría un total de 100 errores externos al hacer validación cruzada: 10 por cada uno de los 10 posibles knots.
+
+- `splines::bs` permite encontrar la base b-spline (aquella base "multiproposito" mencionada en clase) para usar en el problema de regresión.
+
+- `splines::bs` en su argumento `Boundary.knots` permite definir los knots de frontera. Puede dejarlos unas unidades alejadas del rango para asegurar un ajuste apropiado, por ejemplo: `Boundary.knots = range(horsepower) + c(-5,+5)`.
+
+```{r, message=FALSE, warning=FALSE}
+# Validación cruzada
+set.seed(123)
+knots <- 1:10
+folds <- sample(1:10, nrow(Auto), replace = TRUE)
+
+# Error cuadrático medio
+mse <- matrix(NA, nrow = 10, ncol = 10)
+for (k in knots) {
+  for (fold in 1:10) {
+    train_idx <- which(folds != fold)
+    test_idx <- which(folds == fold)
+    
+    # Ajuste del modelo
+    fit <- lm(mpg ~ bs(horsepower, df = k, Boundary.knots = range(Auto$horsepower) + c(-5, +5)), data = Auto[train_idx, ])
+    
+    # Predicción
+    pred <- predict(fit, newdata = Auto[test_idx, ])
+    
+    # Error cuadrático medio
+    mse[k, fold] <- mean((Auto$mpg[test_idx] - pred)^2)
+  }
+}
+# promedio de los ECM por cada fold
+mse_mean_folds <- colMeans(mse)
+
+# Fold óptimo
+fold_opt <- which.min(mse_mean_folds)
+fold_opt
+
+# Knot óptimo
+knot_opt <- which.min(mse[, fold_opt])
+knot_opt
+```
+
+## Pregunta 3
+
+**Usando los datos de entrenamiento, determine el mejor modelo basado en base de funciones** Compare el poder de predicción de los modelos: polinomio grado 2 global, spline suavizado y del modelo de regresión spline óptimo (encontrado en el punto anterior) utilizando validación cruzada en 10 folds. ¿Cuál de los tres modelos seleccionaría basado en el ECM de predicción?
+
+**Ayudas:**
+- Tiene que ajustar en cada fold los 3 modelos, y probar su error en el conjunto de prueba. Por lo tanto, tendría un total de 30 errores externos al hacer validación cruzada: 10 por cada uno de los 3 modelos.
+
+```{r, message=FALSE, warning=FALSE}
+# Ajuste de modelos
+set.seed(123)
+# Modelo de polinomio grado 2 global
+model1 <- lm(mpg ~ poly(horsepower, 2), data = Auto[train, ])
+
+# Modelo de regresión spline suavizado
+model2 <- smooth.spline(Auto$horsepower[train], Auto$mpg[train], cv = TRUE)
+
+# Modelo de regresión spline óptimo
+model3 <- lm(mpg ~ bs(horsepower, df = knot_opt, Boundary.knots = range(Auto$horsepower) + c(-5, +5)), data = Auto[train, ])
+
+# Validación cruzada
+folds <- sample(1:10, nrow(Auto), replace = TRUE)
+
+# Error cuadrático medio
+mse <- matrix(NA, nrow = 3, ncol = 10)
+
+for (fold in 1:10) {
+  test_idx <- which(folds == fold)
+  
+  # Predicciones
+  pred1 <- predict(model1, newdata = Auto[test_idx, ])
+  pred2 <- predict(model2, newdata = Auto[test_idx, ])
+  pred3 <- predict(model3, newdata = Auto[test_idx, ])
+  
+  # Error cuadrático medio
+  mse[1, fold] <- mean((Auto$mpg[test_idx] - pred1)^2)
+  mse[2, fold] <- mean((Auto$mpg[test_idx] - pred2$y)^2)
+  mse[3, fold] <- mean((Auto$mpg[test_idx] - pred3)^2)
+}
+
+# Mejor modelo
+mse_mean <- rowMeans(mse)
+mse_mean
+best_model <- which.min(mse_mean)
+best_model
+```
+
+## Pregunta 4
+
+**Usando los datos de entrenamiento, determine el mejor modelo basado en regresión local**. Determine la regresión polinomial local con kernel gaussiano que resulte en menor error de predicción: regresión de grado 1 o 2. Use el ancho de banda óptimo dado por defecto por la función `loess()`.
+
+**Ayudas:**
+- Es altamente recomendado utilizar `ksmooth` en lugar de `loess` para el estimador de Nadaraya–Watson, sin embargo esto dificulta el proceso de predicción de manera poco interesante. Considere únicamente los grados 1 y 2 en su decisión (note que esto ha sido cambiado en el cuerpo de la pregunta).
+
+```{r, message=FALSE}
+# Ajuste de modelos
+set.seed(123)
+# Regresión local de grado 1
+model1 <- loess(mpg ~ horsepower, degree = 1, data = Auto[train, ])
+
+# Regresión local de grado 2
+model2 <- loess(mpg ~ horsepower, degree = 2, data = Auto[train, ])
+
+# Validación cruzada
+folds <- sample(1:10, nrow(Auto), replace = TRUE)
+
+# Error cuadrático medio
+mse <- matrix(NA, nrow = 2, ncol = 10)
+for (fold in 1:10) {
+    test_idx <- which(folds == fold)
+    
+    # Predicciones
+    pred1 <- predict(model1, newdata = Auto[test_idx, ])
+    pred2 <- predict(model2, newdata = Auto[test_idx, ])
+    
+    # Error cuadrático medio
+    mse[1, fold] <- mean((Auto$mpg[test_idx] - pred1)^2)
+    mse[2, fold] <- mean((Auto$mpg[test_idx] - pred2)^2)
+}
+
+# Mejor modelo
+mse_mean <- rowMeans(mse)
+mse_mean
+best_model <- which.min(mse_mean)
+best_model
+```
+
+## Pregunta 5
+
+**Usando los datos de entrenamiento y de prueba, determine el mejor de los tres paradigmas de modelamiento**. Ajuste el mejor modelo basado en base de funciones, el mejor modelo basado en regresión local y un polinomio global de grado dos con los datos de entrenamiento y calcule el ECM de prueba para cada modelo.
+
+```{r}
+# Ajuste de modelos
+set.seed(123)
+
+# Mejor modelo basado en base de funciones
+model1 <- lm(mpg ~ bs(horsepower, df = knot_opt, Boundary.knots = range(Auto$horsepower) + c(-5, +5)), data = Auto[train, ])
+
+# Mejor modelo basado en regresión local
+model2 <- loess(mpg ~ horsepower, degree = 2, data = Auto[train, ])
+
+# Modelo de polinomio grado 2 global
+model3 <- lm(mpg ~ poly(horsepower, 2), data = Auto[train, ])
+
+# Validación cruzada
+folds <- sample(1:10, nrow(Auto), replace = TRUE)
+
+# Error cuadrático medio
+mse <- matrix(NA, nrow = 3, ncol = 10)
+
+for (fold in 1:10) {
+  test_idx <- which(folds == fold)
+  
+  # Predicciones
+  pred1 <- predict(model1, newdata = Auto[test_idx, ])
+  pred2 <- predict(model2, newdata = Auto[test_idx, ])
+  pred3 <- predict(model3, newdata = Auto[test_idx, ])
+  
+  # Error cuadrático medio
+  mse[1, fold] <- mean((Auto$mpg[test_idx] - pred1)^2)
+  mse[2, fold] <- mean((Auto$mpg[test_idx] - pred2)^2)
+  mse[3, fold] <- mean((Auto$mpg[test_idx] - pred3)^2)
+}
+
+# Mejor modelo
+mse_mean <- rowMeans(mse)
+mse_mean
+best_model <- which.min(mse_mean)
+best_model
+```
+
