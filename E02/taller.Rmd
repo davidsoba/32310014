@@ -300,6 +300,8 @@ set.seed(123)
 aproach(Auto, 10)
 ```
 
+Después de analizar las distribuciones del ECM de prueba, se sugiere optar por el enfoque basado en base de funciones como la mejor opción para abordar el problema. Esto se fundamenta en varios aspectos: En primer lugar, el enfoque de base de funciones exhibe la mediana más baja del ECM de prueba, lo que señala un rendimiento predictivo superior en términos generales. Además, la menor variabilidad observada en el ECM de prueba sugiere una mayor estabilidad del modelo, reduciendo la probabilidad de errores extremos. Por último, la capacidad del enfoque de base de funciones para adaptarse eficazmente a relaciones no lineales entre variables.
+
 # Problema 2
 
 ## Pregunta 7
