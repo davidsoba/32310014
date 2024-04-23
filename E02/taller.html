@@ -1758,8 +1758,8 @@ es aproximadamente 18.64.</li>
 es aproximadamente 18.20.</li>
 </ul>
 <p>Basándonos en el ECM de predicción, el modelo seleccionado sería la
-<strong>regresión local de grado 2</strong>, ya que tiene un ECM
-promedio ligeramente menor que la regresión local de grado 1.</p>
+<em>regresión local de grado 2</em>, ya que tiene un ECM promedio
+ligeramente menor que la regresión local de grado 1.</p>
 </div>
 <div id="pregunta-5" class="section level2">
 <h2>Pregunta 5</h2>
@@ -1820,10 +1820,10 @@ siguientes:</p>
 <li>El modelo de <strong>polinomio global de grado 2</strong>, el ECM de
 prueba es aproximadamente 18.75.</li>
 </ul>
-<p>Basándonos en el ECM de prueba, el mejor modelo sería <em>el mejor
-modelo basado en base de funciones</em>, es decir, la regresión
-<em>spline</em> óptima. Este modelo proporciona el menor error de
-predicción en el conjunto de prueba.</p>
+<p>Basándonos en el ECM de prueba, el mejor modelo sería <em>basado en
+base de funciones</em>, es decir, la regresión <em>spline</em> óptima.
+Este modelo proporciona el menor error de predicción en el conjunto de
+prueba.</p>
 </div>
 <div id="pregunta-6" class="section level2">
 <h2>Pregunta 6</h2>
@@ -1905,6 +1905,20 @@ unidad estadística en <span class="math inline">\(t\)</span>, es decir,
 <p><span class="math display">\[\hat{x_i}(t) = \frac{\sum_{j=1}^{n_i}
 K\left(\frac{t-t_{ij}}{h}\right)x_{ij}}{\sum_{j=1}^{n_i}
 K\left(\frac{t-t_{ij}}{h}\right)}\]</span> Donde:</p>
+<ul>
+<li><span class="math inline">\(\hat{x_i}(t)\)</span> es la estimación
+de la función <span class="math inline">\({x}(t)\)</span> para la
+i-ésima unidad estadística en el punto <span class="math inline">\(t\)</span>.</li>
+<li><span class="math inline">\({n_i}\)</span> es el número de
+observaciones para la i-ésima unidad estadística.<br />
+</li>
+<li><span class="math inline">\({x_i}\)</span> es el valor observado
+para la i-ésima unidad estadística en el punto <span class="math inline">\(t\)</span>.</li>
+<li><span class="math inline">\(k\)</span> es una función de kernel, que
+asigna pesos a las observaciones en función de su distancia a <span class="math inline">\(t\)</span>.</li>
+<li><span class="math inline">\(h\)</span> es el ancho de banda, que
+controla el tamaño de la vecindad en <span class="math inline">\(t\)</span> considerada en la suavización.</li>
+</ul>
 </div>
 <div id="pregunta-8" class="section level2">
 <h2>Pregunta 8</h2>
@@ -1923,6 +1937,12 @@ media</strong></p>
 <p><span class="math display">\[\hat{\mu}(t) = \frac{\sum_{i=1}^N
 \sum_{j=1}^{n_i} K\left(\frac{t-t_{ij}}{h}\right)x_{ij}}{\sum_{i=1}^N
 \sum_{j=1}^{n_i} K\left(\frac{t-t_{ij}}{h}\right)}\]</span> Donde:</p>
+<ul>
+<li><span class="math inline">\(\hat{\mu}(t)\)</span> es la estimación
+de la función media en el punto <span class="math inline">\(t\)</span>.</li>
+<li><span class="math inline">\(N\)</span> es el número total de
+unidades estadísticas.</li>
+</ul>
 </div>
 </div>
 </div>

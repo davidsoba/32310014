@@ -189,7 +189,7 @@ Luego de ajustar los *modelos de regresión local de grado 1 y grado 2*, y reali
  - Para la **regresión local de grado 1**, el ECM promedio es aproximadamente 18.64.
  - Para la **regresión local de grado 2**, el ECM promedio es aproximadamente 18.20.
  
-Basándonos en el ECM de predicción, el modelo seleccionado sería la **regresión local de grado 2**, ya que tiene un ECM promedio ligeramente menor que la regresión local de grado 1. 
+Basándonos en el ECM de predicción, el modelo seleccionado sería la *regresión local de grado 2*, ya que tiene un ECM promedio ligeramente menor que la regresión local de grado 1. 
 
 ## Pregunta 5
 
@@ -241,7 +241,7 @@ Después de ajustar los modelos y calcular el ECM en el conjunto de entrenamient
  - El mejor modelo basado en **regresión local** (regresión local de grado 2), el ECM de prueba es aproximadamente 18.20.
  - El modelo de **polinomio global de grado 2**, el ECM de prueba es aproximadamente 18.75.
  
-Basándonos en el ECM de prueba, el mejor modelo sería *el mejor modelo basado en base de funciones*, es decir, la regresión *spline* óptima. Este modelo proporciona el menor error de predicción en el conjunto de prueba.
+Basándonos en el ECM de prueba, el mejor modelo sería *basado en base de funciones*, es decir, la regresión *spline* óptima. Este modelo proporciona el menor error de predicción en el conjunto de prueba.
 
 ## Pregunta 6
 
@@ -301,6 +301,7 @@ aproach(Auto, 10)
 ```
 
 # Problema 2
+
 ## Pregunta 7
 
 En el contexto de análisis de datos funcionales se tiene una colección finita de observaciones ruidosas, donde para cada individuo, estas se asumen provenientes de una curva de dimensión infinita la cual es evaluada en puntos de un intervalo determinado. Para la i-ésima unidad estadística se tiene un conjunto de $n_i$ observaciones discretizadas $x_{i1},\dots,x_{ij},\dots,x_{in_i}$ de la función $x_i$ en los puntos $t_{i1}, \dots, t_{ij} , \dots, t_{in_i}$ con $x_{ij} \in R, t_{ij} \in T$ y $T$ un intervalo que representa el dominio sobre los reales donde se definen los datos funcionales.
@@ -310,6 +311,11 @@ En el contexto de análisis de datos funcionales se tiene una colección finita 
 $$\hat{x_i}(t) = \frac{\sum_{j=1}^{n_i} K\left(\frac{t-t_{ij}}{h}\right)x_{ij}}{\sum_{j=1}^{n_i} K\left(\frac{t-t_{ij}}{h}\right)}$$
 Donde:
 
+ - $\hat{x_i}(t)$ es la estimación de la función ${x}(t)$ para la i-ésima unidad estadística en el punto $t$.
+ - ${n_i}$ es el número de observaciones para la i-ésima unidad estadística.  
+ - ${x_i}$ es el valor observado para la i-ésima unidad estadística en el punto $t$.
+ - $k$ es una función de kernel, que asigna pesos a las observaciones en función de su distancia a $t$.
+ - $h$ es el ancho de banda, que controla el tamaño de la vecindad en $t$ considerada en la suavización.
 
 
 ## Pregunta 8
@@ -320,4 +326,7 @@ La centralidad de los datos funcionales se resume en la función media $µ$, la 
 
 $$\hat{\mu}(t) = \frac{\sum_{i=1}^N \sum_{j=1}^{n_i} K\left(\frac{t-t_{ij}}{h}\right)x_{ij}}{\sum_{i=1}^N \sum_{j=1}^{n_i} K\left(\frac{t-t_{ij}}{h}\right)}$$
 Donde:
+
+ - $\hat{\mu}(t)$ es la estimación de la función media en el punto  $t$.
+ - $N$ es el número total de unidades estadísticas.
 
