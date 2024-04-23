@@ -309,6 +309,7 @@ En el contexto de análisis de datos funcionales se tiene una colección finita 
 **Escriba el estimador de Nadaraya–Watson para la i-ésima unidad estadística en $t$, es decir, $x(t)$**
 
 $$\hat{x_i}(t) = \frac{\sum_{j=1}^{n_i} K\left(\frac{t-t_{ij}}{h}\right)x_{ij}}{\sum_{j=1}^{n_i} K\left(\frac{t-t_{ij}}{h}\right)}$$
+
 Donde:
 
  - $\hat{x_i}(t)$ es la estimación de la función ${x}(t)$ para la i-ésima unidad estadística en el punto $t$.
@@ -325,6 +326,7 @@ La centralidad de los datos funcionales se resume en la función media $µ$, la 
 **Escriba el estimador de Nadaraya–Watson para la función media en $t$, es decir, $\hat{\mu}(t)$. Note que todos los datos discretizados son utilizados en la estimación de la función media**
 
 $$\hat{\mu}(t) = \frac{\sum_{i=1}^N \sum_{j=1}^{n_i} K\left(\frac{t-t_{ij}}{h}\right)x_{ij}}{\sum_{i=1}^N \sum_{j=1}^{n_i} K\left(\frac{t-t_{ij}}{h}\right)}$$
+
 Donde:
 
  - $\hat{\mu}(t)$ es la estimación de la función media en el punto  $t$.
