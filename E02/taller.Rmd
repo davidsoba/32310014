@@ -99,12 +99,11 @@ Para determinar el número óptimo de *knots* para el problema de regresión *sp
 ```{r, message=FALSE, warning=FALSE}
 # Ajuste de modelos
 set.seed(123)
+
 # Modelo de polinomio grado 2 global
 model1 <- lm(mpg ~ poly(horsepower, 2), data = Auto[train, ])
-
 # Modelo de regresión spline suavizado
 model2 <- smooth.spline(Auto$horsepower[train], Auto$mpg[train], cv = TRUE)
-
 # Modelo de regresión spline óptimo
 model3 <- lm(mpg ~ bs(horsepower, df = knot_opt, Boundary.knots = range(Auto$horsepower) + c(-5, +5)), data = Auto[train, ])
 
@@ -154,12 +153,11 @@ Basándonos en el ECM de predicción, el modelo seleccionado sería el *modelo d
 ```{r, message=FALSE}
 # Ajuste de modelos
 set.seed(123)
+
 # Regresión local de grado 1
 model1 <- loess(mpg ~ horsepower, degree = 1, data = Auto[train, ])
-
 # Regresión local de grado 2
 model2 <- loess(mpg ~ horsepower, degree = 2, data = Auto[train, ])
-
 # Validación cruzada
 folds <- sample(1:10, nrow(Auto), replace = TRUE)
 
@@ -201,10 +199,8 @@ set.seed(123)
 
 # Mejor modelo basado en base de funciones
 model1 <- lm(mpg ~ bs(horsepower, df = knot_opt, Boundary.knots = range(Auto$horsepower) + c(-5, +5)), data = Auto[train, ])
-
 # Mejor modelo basado en regresión local
 model2 <- loess(mpg ~ horsepower, degree = 2, data = Auto[train, ])
-
 # Modelo de polinomio grado 2 global
 model3 <- lm(mpg ~ poly(horsepower, 2), data = Auto[train, ])
 
