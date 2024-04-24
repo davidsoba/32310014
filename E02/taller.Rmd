@@ -4,8 +4,8 @@ subtitle: "Análisis Avanzado de Datos"
 author: "Geraldine Home Saenz - Jose David Soba Loaiza"
 date: "2024-04-24"
 output: rmdformats::downcute
-# bibliography: referencias.bib
-# link-citations: true
+bibliography: referencias.bib
+link-citations: true
 ---
 
 ```{r setup, include=FALSE}
@@ -45,13 +45,11 @@ test <- seq(sample_size)[!seq(sample_size) %in% train]
 **Usando los datos de entrenamiento** Mediante validación cruzada en 10 *folds*, determine el número óptimo de *knots* para el problema de regresión *spline*. Considere como número de posible de *knots* 1,...,10, igualmente espaciados en el rango de la variable `horsepower`. ¿Qué modelo (es decir, cual valor de *knot* con k = 1,...,10) resulta en un menor ECM de predicción?
 
 **Ayudas:**
-- Puede ser conveniente definir los folds de manera aleatoria como `sample(1:10,n,replace=TRUE)` para facilitar la validación cruzada.
 
-- Tiene que ajustar en cada fold los 10 posibles knots, y probar su error en el conjunto de prueba. Por lo tal, tendría un total de 100 errores externos al hacer validación cruzada: 10 por cada uno de los 10 posibles knots.
-
-- `splines::bs` permite encontrar la base b-spline (aquella base "multiproposito" mencionada en clase) para usar en el problema de regresión.
-
-- `splines::bs` en su argumento `Boundary.knots` permite definir los knots de frontera. Puede dejarlos unas unidades alejadas del rango para asegurar un ajuste apropiado, por ejemplo: `Boundary.knots = range(horsepower) + c(-5,+5)`.
+- Puede ser conveniente definir los *folds* de manera aleatoria como `sample(1:10,n,replace=TRUE)` para facilitar la validación cruzada.
+- Tiene que ajustar en cada *fold* los 10 posibles *knots*, y probar su error en el conjunto de prueba. Por lo tal, tendría un total de 100 errores externos al hacer validación cruzada: 10 por cada uno de los 10 posibles *knots*.
+- `splines::bs` permite encontrar la base *b-spline* (aquella base "multiproposito" mencionada en clase) para usar en el problema de regresión.
+- `splines::bs` en su argumento `Boundary.knots` permite definir los *knots* de frontera. Puede dejarlos unas unidades alejadas del rango para asegurar un ajuste apropiado, por ejemplo: `Boundary.knots = range(horsepower) + c(-5,+5)`.
 
 ```{r, message=FALSE, warning=FALSE}
 # Validación cruzada
@@ -92,10 +90,11 @@ Para determinar el número óptimo de *knots* para el problema de regresión *sp
 
 ## Pregunta 3
 
-**Usando los datos de entrenamiento, determine el mejor modelo basado en base de funciones** Compare el poder de predicción de los modelos: polinomio grado 2 global, spline suavizado y del modelo de regresión spline óptimo (encontrado en el punto anterior) utilizando validación cruzada en 10 folds. ¿Cuál de los tres modelos seleccionaría basado en el ECM de predicción?
+**Usando los datos de entrenamiento, determine el mejor modelo basado en base de funciones** Compare el poder de predicción de los modelos: polinomio grado 2 global, *spline* suavizado y del modelo de regresión *spline* óptimo (encontrado en el punto anterior) utilizando validación cruzada en 10 *folds*. ¿Cuál de los tres modelos seleccionaría basado en el ECM de predicción?
 
 **Ayudas:**
-- Tiene que ajustar en cada fold los 3 modelos, y probar su error en el conjunto de prueba. Por lo tanto, tendría un total de 30 errores externos al hacer validación cruzada: 10 por cada uno de los 3 modelos.
+
+- Tiene que ajustar en cada *fold* los 3 modelos, y probar su error en el conjunto de prueba. Por lo tanto, tendría un total de 30 errores externos al hacer validación cruzada: 10 por cada uno de los 3 modelos.
 
 ```{r, message=FALSE, warning=FALSE}
 # Ajuste de modelos
@@ -149,6 +148,7 @@ Basándonos en el ECM de predicción, el modelo seleccionado sería el *modelo d
 **Usando los datos de entrenamiento, determine el mejor modelo basado en regresión local**. Determine la regresión polinomial local con kernel gaussiano que resulte en menor error de predicción: regresión de grado 1 o 2. Use el ancho de banda óptimo dado por defecto por la función `loess()`.
 
 **Ayudas:**
+
 - Es altamente recomendado utilizar `ksmooth` en lugar de `loess` para el estimador de Nadaraya–Watson, sin embargo esto dificulta el proceso de predicción de manera poco interesante. Considere únicamente los grados 1 y 2 en su decisión (note que esto ha sido cambiado en el cuerpo de la pregunta).
 
 ```{r, message=FALSE}
@@ -245,7 +245,7 @@ Basándonos en el ECM de prueba, el mejor modelo sería *basado en base de funci
 
 ## Pregunta 6
 
-Repita (1)-(5) un total de 10 veces de manera que en el paso (1) conforme una nueva muestra de validación cruzada, esto le permitirá obtener 10 ECM de prueba para cada paradigma de modelamiento. Grafique las tres distribuciones del ECM de prueba y responda ¿Cuál acercamiento seleccionaría basado en el ECM de predición: basado en base de funciones, basado en regresión local o polinomial global?.
+Repita (1)-(5) un total de 10 veces de manera que en el paso (1) conforme una nueva muestra de validación cruzada, esto le permitirá obtener 10 ECM de prueba para cada paradigma de modelamiento. Grafique las tres distribuciones del ECM de prueba y responda ¿Cuál acercamiento seleccionaría basado en el ECM de predicción: basado en base de funciones, basado en regresión local o polinomial global?.
 
 ```{r, message=FALSE}
 # Función para ajustar modelos y calcular el ECM
@@ -300,6 +300,8 @@ set.seed(123)
 aproach(Auto, 10)
 ```
 
+El análisis de las distribuciones del ECM de prueba para cada acercamiento a través de *boxplots*, revela que el método de regresión basado en **base de funciones** (regresión *spline* óptima) presenta el mejor desempeño en términos del error de predicción. Esto se evidencia en la menor dispersión de los valores del ECM para este método, incluso cuando su mediana es ligeramente superior a la de los otros dos enfoques.
+
 # Problema 2
 
 ## Pregunta 7
@@ -308,15 +310,17 @@ En el contexto de análisis de datos funcionales se tiene una colección finita 
 
 **Escriba el estimador de Nadaraya–Watson para la i-ésima unidad estadística en $t$, es decir, $x(t)$**
 
+De acuerdo con [@bib01], [@bib02] y [@bib03], el estimador de Nadaraya–Watson para la i-ésima unidad estadística en $t$ es:
+
 $$\hat{x_i}(t) = \frac{\sum_{j=1}^{n_i} K\left(\frac{t-t_{ij}}{h}\right)x_{ij}}{\sum_{j=1}^{n_i} K\left(\frac{t-t_{ij}}{h}\right)}$$
 
 Donde:
 
- - $\hat{x_i}(t)$ es la estimación de la función ${x}(t)$ para la i-ésima unidad estadística en el punto $t$.
+ - $\hat{x_i}(t)$ es la estimación de la función ${x}(t)$ para la i-ésima unidad estadística en $t$.
  - ${n_i}$ es el número de observaciones para la i-ésima unidad estadística.  
- - ${x_i}$ es el valor observado para la i-ésima unidad estadística en el punto $t$.
+ - ${x_i}$ es el valor observado para la i-ésima unidad estadística en $t$.
  - $k$ es una función de kernel, que asigna pesos a las observaciones en función de su distancia a $t$.
- - $h$ es el ancho de banda, que controla el tamaño de la vecindad en $t$ considerada en la suavización.
+ - $h$ es el ancho de banda, que controla el tamaño de la vecindad en $t$.
 
 
 ## Pregunta 8
@@ -325,10 +329,13 @@ La centralidad de los datos funcionales se resume en la función media $µ$, la 
 
 **Escriba el estimador de Nadaraya–Watson para la función media en $t$, es decir, $\hat{\mu}(t)$. Note que todos los datos discretizados son utilizados en la estimación de la función media**
 
+De acuerdo con [@bib01], [@bib02] y [@bib03], el estimador de Nadaraya–Watson para la función media en $t$ es:
+
 $$\hat{\mu}(t) = \frac{\sum_{i=1}^N \sum_{j=1}^{n_i} K\left(\frac{t-t_{ij}}{h}\right)x_{ij}}{\sum_{i=1}^N \sum_{j=1}^{n_i} K\left(\frac{t-t_{ij}}{h}\right)}$$
 
 Donde:
 
- - $\hat{\mu}(t)$ es la estimación de la función media en el punto  $t$.
+ - $\hat{\mu}(t)$ es la estimación de la función media en $t$.
  - $N$ es el número total de unidades estadísticas.
 
+# Referencias
