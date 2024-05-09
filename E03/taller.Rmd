@@ -1,0 +1,134 @@
+---
+title: "Taller 3"
+subtitle: "Análisis Avanzado de Datos"
+author: "Geraldine Home Saenz - Jose David Soba Loaiza"
+date: "2024-05-15"
+output: rmdformats::downcute
+# bibliography: referencias.bib
+link-citations: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE, warning=FALSE}
+# Librerías
+library(tidyverse)
+```
+
+# Problema 1
+
+Una familia de distribuciones $P_\theta$ con $\theta \in \Theta$ pertenece a la familia exponencial de distribuciones si si $fmp/fdp$ puede escribirse como:
+
+$$p(x|\eta)=h(x)\exp\left(\eta(\theta)t(x)-a(\theta)\right)$$
+
+Para funciones reales $h(x)$, $a(\theta)$ y $t(x)$. Muestre que tanto la distribución Bernoulli (utilizada para la regresión logística), la distribución normal (utilizada en la regresión lineal) y la distribución Poisson (utilizada en la regresión Poisson sobre conteos) pertenece a esta familia de distribuciones.
+
+# Problema 2
+
+La universidad de California Irvine (UCI) tiene un repositorio de datos de ejemplo para el uso de machine learning y aprendizaje estadístico. Uno de los conjuntos de datos es el denominado *Heart Disease*, su descripción detallada se encuentra en el URL a continuación: [https://archive.ics.uci.edu/dataset/45/heart+disease](https://archive.ics.uci.edu/dataset/45/heart+disease)
+
+Utilice los datos procesados disponibles en el enlace presentado a continuación para el desarrollo del ejercicio: [http://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/processed.
+ cleveland.data](http://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/processed.
+ cleveland.data)
+
+Con el conjunto de datos completo, construya un modelo de regresión logístico con funciones de enlace logit **tomando como respuesta la presencia de la enfermedad cardíaca**, use las demás variables como explicativas en el modelo de regresión. Revise las URL dadas para la definición de cada una de las variables y note que debe obtener la variable respuesta categorizando una de las variables del conjunto de datos. Siga los siguientes pasos en la realización del ejercicio:
+
+```{r}
+# Datos
+url <- "http://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/processed.cleveland.data"
+heart_data <- read.csv(url, header = FALSE)
+
+# Nombre de las variables
+colnames(heart_data) <- c("age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach", "exang", "oldpeak", "slope", "ca", "thal", "num")
+
+# Categorización de la variable respuesta
+heart_data <- heart_data %>%
+  mutate(num = ifelse(num %in% c(1,2,3,4), 1, 0))
+```
+
+## Literal 1
+
+**Imputar datos:** El conjunto de datos tiene datos perdidos en algunas variables. Estos están notados con un "?". Impute los valores perdidos como la mediana de los datos para las variables correspondientes.
+
+```{r}
+# Reemplazar los valores "?" con NA
+heart_data[heart_data == "?"] <- NA
+
+# Convertir todas las columnas a tipo numérico
+heart_data <- apply(heart_data, 2, as.numeric)
+
+# Imputar los valores perdidos con la mediana de cada columna
+heart_data <- apply(heart_data, 2, function(x) {replace(x, is.na(x), median(x, na.rm = TRUE))})
+
+heart_data <- as.data.frame(heart_data)
+
+# Validación de valores nulos
+sum(is.na(heart_data))
+```
+## Literal 2
+
+**Revisar las distribuciones bivariadas:** Revise la distribución de la variable respuesta para cada una de las covariables categóricas de manera bivariada. ¿Observa algún inconveniente con alguna de las variables al hacer el análisis?
+
+```{r fig.height=20, fig.width=20}
+# Revisar distribución de la variable respuesta para cada covariable categórica
+categoricas <- c("sex", "cp", "fbs", "restecg", "exang", "slope", "thal")
+
+par(mfrow = c(3, 3))
+
+for (var in categoricas) {
+  # Tabla de contingencia
+  contingency_table <- table(heart_data$num, heart_data[[var]])
+  print(paste("Tabla de contingencia para la variable", var))
+  print(contingency_table)
+  
+  # Gráfico de barras
+  barplot(contingency_table, beside = TRUE, legend = TRUE,
+          main = paste("Distribución de", var, "para la variable respuesta"),
+          xlab = var, ylab = "Frecuencia", col = c("blue", "red"))
+}
+```
+
+En primer lugar, en la variable "sex", se destaca una proporción significativamente más alta de hombres (1) en comparación con mujeres (0) en el conjunto de datos. Además, al examinar la variable "cp" (tipo de dolor en el pecho), se encuentra que la mayoría de los pacientes tienen dolor de pecho no anginal (valor 3) o son asintomáticos (valor 4).
+
+En cuanto a las variables relacionadas con mediciones médicas, la mayoría de los pacientes tienen niveles de azúcar en sangre en ayunas menores o iguales a 120 mg/dl (valor 0) en la variable "fbs". En la variable "restecg" (resultados electrocardiográficos en reposo), la mayoría de los pacientes muestran resultados normales (valor 0), lo que sugiere una función cardíaca típica en reposo.
+
+Sin embargo, hay algunas consideraciones importantes que se deben tener en cuenta. Por ejemplo, en la variable "exang" (angina inducida por el ejercicio), se observa una cantidad considerable de pacientes que no experimentan angina durante el ejercicio (valor 0). Además, en la variable "slope" (pendiente del segmento ST durante el ejercicio), la mayoría de los pacientes muestran una pendiente ascendente del segmento ST durante el ejercicio (valor 1). 
+
+## Literal 3
+
+**Modelo bivariado:** Calcule manualmente (como lo vimos en clase, a partir de la tabla de contingencia), los parámetros estimados de regresión logística considerando únicamente la variable `fbc` (glucemia en ayunas) y la variable respuesta. Verifique el resultado ajustanto el `glm` correspondiente.
+
+```{r}
+# Tabla de contingencia para fbs y la variable respuesta
+tabla_contingencia <- table(heart_data$fbs, heart_data$num)
+
+# Cálculo de las proporciones de eventos y no eventos para cada nivel de fbs
+prop_evento <- apply(tabla_contingencia, 2, sum) / sum(tabla_contingencia)
+prop_no_evento <- 1 - prop_evento
+
+# Cálculo del log(odds) para cada nivel de fbs
+log_odds <- log(prop_evento / prop_no_evento)
+
+#Ajuste del modelo de regresión logística
+logistic_model <- glm(target ~ fbs, data = heart_data, family = binomial)
+summary(logistic_model)$coefficients
+```
+
+
+## Literal 4
+
+**Modelo multivariado:** Ajuste un nuevo modelo con todas las variables. ¿Cuáles variables son significativas mediante el test de Wald? ¿Cuáles no lo son?
+
+## Literal 5
+
+**Visualización de probabilidades predichas bajo modelo multivariado:** Usando el modelo del punto anterior, encuentre las proabilidades de presentar enfermedad cardiaca y visualicelas junto a la variable respuesta. ¿Describe el modelo la presencia de enfermedad cardiaca?
+
+# Problema 3
+
+El conjunto de datos `ADD-taller03.xlsx` contiene la predicción de incumplimiento de pago de tarjeta de crédito bajo dos modelos logísticos diferentes para un total de 9080 clientes. Se cuenta además con la variable de incumplimiento observada al finalizar el periodo. ¿Cuál de los dos modelos logísticos tiene mayor poder de predicción? Explique con fundamento estadístico su resultado.
+
+# Problema 4
+
+Repita el problema 2, pero en lugar de imputar los datos mediante la mediana en el literal 1, utilice el algoritmo EM.
