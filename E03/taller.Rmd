@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r, message=FALSE, warning=FALSE}
 # Librerías
 library(tidyverse)
+library(mice)
 ```
 
 # Problema 1
@@ -53,40 +54,40 @@ heart_data <- heart_data %>%
 **Imputar datos:** El conjunto de datos tiene datos perdidos en algunas variables. Estos están notados con un "?". Impute los valores perdidos como la mediana de los datos para las variables correspondientes.
 
 ```{r}
-# Reemplazar los valores "?" con NA
-heart_data[heart_data == "?"] <- NA
-
-# Convertir todas las columnas a tipo numérico
-heart_data <- apply(heart_data, 2, as.numeric)
-
-# Imputar los valores perdidos con la mediana de cada columna
-heart_data <- apply(heart_data, 2, function(x) {replace(x, is.na(x), median(x, na.rm = TRUE))})
-
-heart_data <- as.data.frame(heart_data)
+# Imputación de datos con la mediana de cada columna
+heart_data <- heart_data %>%
+  mutate_all(~ifelse(. == "?", NA, .)) %>%
+  mutate_all(as.numeric) %>%
+  mutate_all(~replace(., is.na(.), median(., na.rm = TRUE)))
 
 # Validación de valores nulos
 sum(is.na(heart_data))
 ```
+
 ## Literal 2
 
 **Revisar las distribuciones bivariadas:** Revise la distribución de la variable respuesta para cada una de las covariables categóricas de manera bivariada. ¿Observa algún inconveniente con alguna de las variables al hacer el análisis?
 
-```{r fig.height=20, fig.width=20}
-# Revisar distribución de la variable respuesta para cada covariable categórica
+```{r warning=FALSE, fig.height=20, fig.width=20}
+# Covariables categóricas
 categoricas <- c("sex", "cp", "fbs", "restecg", "exang", "slope", "thal")
 
+# Gráficos
 par(mfrow = c(3, 3))
 
 for (var in categoricas) {
   # Tabla de contingencia
-  contingency_table <- table(heart_data$num, heart_data[[var]])
-  print(paste("Tabla de contingencia para la variable", var))
-  print(contingency_table)
-  
-  # Gráfico de barras
-  barplot(contingency_table, beside = TRUE, legend = TRUE,
-          main = paste("Distribución de", var, "para la variable respuesta"),
-          xlab = var, ylab = "Frecuencia", col = c("blue", "red"))
+  contingencia <- table(heart_data$num, heart_data[[var]])
+  barplot(contingencia,
+          beside = TRUE,
+          legend = TRUE,
+          xlab = var,
+          cex.lab = 2.5,
+          cex.axis = 1.5,
+          cex.names = 1.5,
+          legend.text = c("0: No enfermedad", "1: Enfermedad"),
+          args.legend = list(cex = 2)
+  )
 }
 ```
 
@@ -98,32 +99,61 @@ Sin embargo, hay algunas consideraciones importantes que se deben tener en cuent
 
 ## Literal 3
 
-**Modelo bivariado:** Calcule manualmente (como lo vimos en clase, a partir de la tabla de contingencia), los parámetros estimados de regresión logística considerando únicamente la variable `fbc` (glucemia en ayunas) y la variable respuesta. Verifique el resultado ajustanto el `glm` correspondiente.
+**Modelo bivariado:** Calcule manualmente (como lo vimos en clase, a partir de la tabla de contingencia), los parámetros estimados de regresión logística considerando únicamente la variable `fbs` (glucemia en ayunas) y la variable respuesta. Verifique el resultado ajustanto el `glm` correspondiente.
 
-```{r}
-# Tabla de contingencia para fbs y la variable respuesta
-tabla_contingencia <- table(heart_data$fbs, heart_data$num)
+```{r, warning=FALSE}
+# Tabla de contingencia
+contingencia <- table(heart_data$fbs, heart_data$num)
+rownames(contingencia) <- c("Glucemia <= 120 mg/dl", "Glucemia > 120 mg/dl")
+colnames(contingencia) <- c("No enfermedad", "Enfermedad")
+contingencia
 
-# Cálculo de las proporciones de eventos y no eventos para cada nivel de fbs
-prop_evento <- apply(tabla_contingencia, 2, sum) / sum(tabla_contingencia)
-prop_no_evento <- 1 - prop_evento
+# Probabilidades
+prob_enfermedad_no_fbs <- contingencia[1, 2] / sum(contingencia[1, ])
+prob_enfermedad_si_fbs <- contingencia[2, 2] / sum(contingencia[2, ])
 
-# Cálculo del log(odds) para cada nivel de fbs
-log_odds <- log(prop_evento / prop_no_evento)
-
-#Ajuste del modelo de regresión logística
-logistic_model <- glm(target ~ fbs, data = heart_data, family = binomial)
-summary(logistic_model)$coefficients
+# odds
+odds_enfermedad_no_fbs <- contingencia[1, 2] / contingencia[1, 1]
+odds_enfermedad_si_fbs <- contingencia[2, 2] / contingencia[2, 1]
+odd_ratio_enfermedad <- odds_enfermedad_no_fbs / odds_enfermedad_si_fbs
+log_odd_ratio_enfermedad <- log(odds_enfermedad_no_fbs) - log(odds_enfermedad_si_fbs)
 ```
 
+
+```{r}
+# Modelo bivariado
+logit_model <- glm(num ~ fbs, data = heart_data, family = binomial)
+summary(logit_model)$coefficients
+```
 
 ## Literal 4
 
 **Modelo multivariado:** Ajuste un nuevo modelo con todas las variables. ¿Cuáles variables son significativas mediante el test de Wald? ¿Cuáles no lo son?
 
+```{r}
+# Modelo multivariado
+logit_model_multivariable <- glm(num ~ ., data = heart_data, family = binomial)
+summary(logit_model_multivariable)$coefficients
+```
+
 ## Literal 5
 
-**Visualización de probabilidades predichas bajo modelo multivariado:** Usando el modelo del punto anterior, encuentre las proabilidades de presentar enfermedad cardiaca y visualicelas junto a la variable respuesta. ¿Describe el modelo la presencia de enfermedad cardiaca?
+**Visualización de probabilidades predichas bajo modelo multivariado:** Usando el modelo del punto anterior, encuentre las probabilidades de presentar enfermedad cardíaca y visualícelas junto a la variable respuesta. ¿Describe el modelo la presencia de enfermedad cardíaca?
+
+```{r warning=FALSE, message=FALSE}
+# Probabilidades predichas
+heart_data <- heart_data %>%
+  mutate(prob_pred = predict(logit_model_multivariable, type = "response"))
+
+# Gráfico
+ggplot(heart_data, aes(x = prob_pred, y = num)) +
+  geom_point(aes(color = factor(num))) +
+  geom_smooth(method = "glm", method.args = list(family = "binomial"), se = FALSE) +
+  labs(x = "Probabilidad predicha",
+       y = "Enfermedad cardíaca") +
+  theme(legend.position = "none") +
+  scale_color_manual(values = c("0" = "black", "1" = "gray"))
+```
 
 # Problema 3
 
@@ -132,3 +162,114 @@ El conjunto de datos `ADD-taller03.xlsx` contiene la predicción de incumplimien
 # Problema 4
 
 Repita el problema 2, pero en lugar de imputar los datos mediante la mediana en el literal 1, utilice el algoritmo EM.
+
+```{r}
+# Datos
+url <- "http://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/processed.cleveland.data"
+heart_data <- read.csv(url, header = FALSE)
+
+# Nombre de las variables
+colnames(heart_data) <- c("age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach", "exang", "oldpeak", "slope", "ca", "thal", "num")
+
+# Categorización de la variable respuesta
+heart_data <- heart_data %>%
+  mutate(num = ifelse(num %in% c(1,2,3,4), 1, 0))
+```
+
+## Literal 1
+
+**Imputar datos:** El conjunto de datos tiene datos perdidos en algunas variables. Estos están notados con un "?". Impute los valores perdidos utilizando el algoritmo EM.
+
+```{r warning=FALSE, message=FALSE}
+# Imputación de datos con el algoritmo EM
+heart_data <- mice(heart_data, m = 1, method = "norm.boot", maxit = 50, seed = 123)
+heart_data <- complete(heart_data)
+
+# Validación de valores nulos
+sum(is.na(heart_data))
+```
+
+## Literal 2
+
+**Revisar las distribuciones bivariadas:** Revise la distribución de la variable respuesta para cada una de las covariables categóricas de manera bivariada. ¿Observa algún inconveniente con alguna de las variables al hacer el análisis?
+
+```{r warning=FALSE, fig.height=20, fig.width=20}
+# Covariables categóricas
+categoricas <- c("sex", "cp", "fbs", "restecg", "exang", "slope", "thal")
+
+# Gráficos
+par(mfrow = c(3, 3))
+
+for (var in categoricas) {
+  # Tabla de contingencia
+  contingencia <- table(heart_data$num, heart_data[[var]])
+  barplot(contingencia,
+          beside = TRUE,
+          legend = TRUE,
+          xlab = var,
+          cex.lab = 2.5,
+          cex.axis = 1.5,
+          cex.names = 1.5,
+          legend.text = c("0: No enfermedad", "1: Enfermedad"),
+          args.legend = list(cex = 2)
+  )
+}
+```
+
+## Literal 3
+
+**Modelo bivariado:** Calcule manualmente (como lo vimos en clase, a partir de la tabla de contingencia), los parámetros estimados de regresión logística considerando únicamente la variable `fbs` (glucemia en ayunas) y la variable respuesta. Verifique el resultado ajustanto el `glm` correspondiente.
+
+```{r, warning=FALSE}
+# Tabla de contingencia
+contingencia <- table(heart_data$fbs, heart_data$num)
+rownames(contingencia) <- c("Glucemia <= 120 mg/dl", "Glucemia > 120 mg/dl")
+colnames(contingencia) <- c("No enfermedad", "Enfermedad")
+contingencia
+
+# Probabilidades
+prob_enfermedad_no_fbs <- contingencia[1, 2] / sum(contingencia[1, ])
+prob_enfermedad_si_fbs <- contingencia[2, 2] / sum(contingencia[2, ])
+
+# odds
+odds_enfermedad_no_fbs <- contingencia[1, 2] / contingencia[1, 1]
+odds_enfermedad_si_fbs <- contingencia[2, 2] / contingencia[2, 1]
+odd_ratio_enfermedad <- odds_enfermedad_no_fbs / odds_enfermedad_si_fbs
+log_odd_ratio_enfermedad <- log(odds_enfermedad_no_fbs) - log(odds_enfermedad_si_fbs)
+```
+
+
+```{r}
+# Modelo bivariado
+logit_model <- glm(num ~ fbs, data = heart_data, family = binomial)
+summary(logit_model)$coefficients
+```
+
+## Literal 4
+
+**Modelo multivariado:** Ajuste un nuevo modelo con todas las variables. ¿Cuáles variables son significativas mediante el test de Wald? ¿Cuáles no lo son?
+
+```{r}
+# Modelo multivariado
+logit_model_multivariable <- glm(num ~ ., data = heart_data, family = binomial)
+summary(logit_model_multivariable)$coefficients
+```
+
+## Literal 5
+
+**Visualización de probabilidades predichas bajo modelo multivariado:** Usando el modelo del punto anterior, encuentre las probabilidades de presentar enfermedad cardíaca y visualícelas junto a la variable respuesta. ¿Describe el modelo la presencia de enfermedad cardíaca?
+
+```{r warning=FALSE, message=FALSE}
+# Probabilidades predichas
+heart_data <- heart_data %>%
+  mutate(prob_pred = predict(logit_model_multivariable, type = "response"))
+
+# Gráfico
+ggplot(heart_data, aes(x = prob_pred, y = num)) +
+  geom_point(aes(color = factor(num))) +
+  geom_smooth(method = "glm", method.args = list(family = "binomial"), se = FALSE) +
+  labs(x = "Probabilidad predicha",
+       y = "Enfermedad cardíaca") +
+  theme(legend.position = "none") +
+  scale_color_manual(values = c("0" = "black", "1" = "gray"))
+```
