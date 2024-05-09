@@ -13,8 +13,6 @@ Entregas para la clase de Análisis Avanzado de Datos de la Maestría en Matemá
 |   ├── referencias.bib       <- Referencias
 |   ├── taller.Rmd            <- Material en formato RMarkdown
 |   ├── taller.html           <- Material en formato HTML
-├── .gitignore             <- Archivos que no serán rastreados en Git
-├── 32310014.Rproj         <- Archivo de proyecto de RStudio
 ├── E03                    <- Material de la tercera entrega: "Taller 3"
 |   ├── referencias.bib       <- Referencias
 |   ├── taller.Rmd            <- Material en formato RMarkdown
