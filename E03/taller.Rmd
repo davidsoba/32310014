@@ -141,11 +141,7 @@ for (var in categoricas) {
 }
 ```
 
-En primer lugar, en la variable "sex", se destaca una proporción significativamente más alta de hombres (1) en comparación con mujeres (0) en el conjunto de datos. Además, al examinar la variable "cp" (tipo de dolor en el pecho), se encuentra que la mayoría de los pacientes tienen dolor de pecho no anginal (valor 3) o son asintomáticos (valor 4).
-
-En cuanto a las variables relacionadas con mediciones médicas, la mayoría de los pacientes tienen niveles de azúcar en sangre en ayunas menores o iguales a 120 mg/dl (valor 0) en la variable "fbs". En la variable "restecg" (resultados electrocardiográficos en reposo), la mayoría de los pacientes muestran resultados normales (valor 0), lo que sugiere una función cardíaca típica en reposo.
-
-Sin embargo, hay algunas consideraciones importantes que se deben tener en cuenta. Por ejemplo, en la variable "exang" (angina inducida por el ejercicio), se observa una cantidad considerable de pacientes que no experimentan angina durante el ejercicio (valor 0). Además, en la variable "slope" (pendiente del segmento ST durante el ejercicio), la mayoría de los pacientes muestran una pendiente ascendente del segmento ST durante el ejercicio (valor 1). 
+Se observa una diferencia significativa en la proporción de enfermedad cardíaca entre hombres y mujeres, donde la proporción de casos positivos es más alta en hombres que en mujeres. En cuanto al tipo de dolor en el pecho reportado, se evidencia una variabilidad en la proporción de enfermedad cardíaca, siendo los pacientes con dolor de pecho atípico (valor 2) o asintomáticos (valor 4) los que tienen una mayor proporción de casos positivos para enfermedad cardíaca. Por otro lado, no parece haber una diferencia significativa en la proporción de enfermedad cardíaca entre pacientes con azúcar en sangre en ayunas mayor o igual a 120 mg/dl (valor 1) y aquellos con azúcar en sangre en ayunas menor a 120 mg/dl (valor 0). Además, la proporción de enfermedad cardíaca parece variar según los resultados electrocardiográficos en reposo, la presencia de angina inducida por el ejercicio y la pendiente del segmento ST durante el ejercicio.Respecto al resultado del test de talio, se observa una variabilidad en la proporción de enfermedad cardíaca, siendo los pacientes con un resultado de talio 7 los que parecen tener una mayor proporción de casos positivos para enfermedad cardíaca.
 
 ## Literal 3
 
