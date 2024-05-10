@@ -1,5 +1,5 @@
 ---
-title: "Taller 3"
+title: "Taller 3 - Modelos generalizados. Regresión logística, variables latentes y datos estructurados."
 subtitle: "Análisis Avanzado de Datos"
 author: "Geraldine Home Saenz - Jose David Soba Loaiza"
 date: "2024-05-15"
@@ -25,6 +25,57 @@ Una familia de distribuciones $P_\theta$ con $\theta \in \Theta$ pertenece a la 
 $$p(x|\eta)=h(x)\exp\left(\eta(\theta)t(x)-a(\theta)\right)$$
 
 Para funciones reales $h(x)$, $a(\theta)$ y $t(x)$. Muestre que tanto la distribución Bernoulli (utilizada para la regresión logística), la distribución normal (utilizada en la regresión lineal) y la distribución Poisson (utilizada en la regresión Poisson sobre conteos) pertenece a esta familia de distribuciones.
+
+*DISTRIBUCIÓN BERNOULLI:*
+$$P(x|\theta)= \begin{cases} \theta & \text{si } x = 1 \\ 1-\theta & \text{si } x = 0 \end{cases}$$
+
+$$p(x|\theta)= \binom{n}{x} \theta^{x} (1-\theta)^{1-x}$$
+
+.
+.
+.
+
+
+*DISTRIBUCIÓN NORMAL:*
+$$p(x|\sigma) = \frac{1}{\sqrt{2\pi\sigma^{2}}} \ e^{\left(-\frac{1}{2\sigma^{2}} \cdot (x-\mu)^{2} \right)}$$
+
+$$p(x|\sigma) = \frac{1}{\sqrt{2\pi\sigma^{2}}} \ exp^{\left(-\frac{x^{2}}{2\sigma^2}+\frac{x\mu}{\sigma^{2}}-\frac{\mu^{2}}{2\sigma^{2}}\right)}$$
+
+$$p(x|\sigma) = \left[ \frac{1}{\sqrt{2\pi\sigma^{2}}} \exp{\left(-\frac{x^{2}}{2\sigma^2}\right)} \right] \cdot \exp \left( \frac{\mu}{\sigma^{2}}x-\frac{\mu^{2}}{2\sigma^{2}} \right)$$
+
+$$p(x|\sigma) = \frac{1}{\sqrt{2\pi}} \cdot \exp \left( \frac{\mu}{\sigma^{2}}x-\frac{x^{2}}{2\sigma^{2}}-\frac{\mu^{2}}{2\sigma^{2}}- \frac{1}{2} log (2\pi\sigma^{2}) \right)$$
+
+Donde:
+
+- $h(x) =  \frac{1}{\sqrt{2\pi}}$
+
+- $t(x) = x$
+
+- $\eta(\theta) = \frac{\mu}{\sigma^{2}}$
+
+- $a(\theta) = \frac{\mu^{2}}{2\sigma^2}$
+
+*DISTRIBUCIÓN DE POISSON:*
+$$P(k|\lambda) = \frac{e^{-\lambda} \lambda^k}{k!}$$
+
+$$P(x|\lambda) = \frac{\lambda^x}{x!}\cdot e^{-\lambda}$$
+
+$$P(x|\lambda) = \frac{1}{x!}\cdot (\lambda^x\cdot e^{-\lambda})$$
+
+$$P(x|\lambda) = \frac{1}{x!}\cdot (exp(log(\lambda^{x}))\cdot e^{-\lambda})$$
+
+$$P(x|\lambda) =  \frac{1}{x!} \cdot exp(x\cdot log(\lambda)- \lambda)$$
+
+Donde: 
+
+- $h(x) = \frac{1}{x!}$
+
+- $t(x) = x$
+
+- $a(\theta) = -\lambda$
+
+- $\eta(\lambda) = \log(\lambda)$
+
 
 # Problema 2
 
