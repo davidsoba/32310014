@@ -31,9 +31,8 @@ $$P(x|\theta)= \begin{cases} \theta & \text{si } x = 1 \\ 1-\theta & \text{si } 
 
 $$p(x|\theta)= \binom{n}{x} \theta^{x} (1-\theta)^{1-x}$$
 
-.
-.
-.
+
+
 
 
 *DISTRIBUCIÓN NORMAL:*
