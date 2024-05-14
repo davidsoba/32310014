@@ -139,6 +139,7 @@ for (var in categoricas) {
           args.legend = list(cex = 2)
   )
 }
+
 ```
 
 Se observa una diferencia significativa en la proporción de enfermedad cardíaca entre hombres y mujeres, donde la proporción de casos positivos es más alta en hombres que en mujeres. En cuanto al tipo de dolor en el pecho reportado, se evidencia una variabilidad en la proporción de enfermedad cardíaca, siendo los pacientes con dolor de pecho atípico (valor 2) o asintomáticos (valor 4) los que tienen una mayor proporción de casos positivos para enfermedad cardíaca. Por otro lado, no parece haber una diferencia significativa en la proporción de enfermedad cardíaca entre pacientes con azúcar en sangre en ayunas mayor o igual a 120 mg/dl (valor 1) y aquellos con azúcar en sangre en ayunas menor a 120 mg/dl (valor 0). Además, la proporción de enfermedad cardíaca parece variar según los resultados electrocardiográficos en reposo, la presencia de angina inducida por el ejercicio y la pendiente del segmento ST durante el ejercicio.Respecto al resultado del test de talio, se observa una variabilidad en la proporción de enfermedad cardíaca, siendo los pacientes con un resultado de talio 7 los que parecen tener una mayor proporción de casos positivos para enfermedad cardíaca.
@@ -181,6 +182,8 @@ summary(logit_model)$coefficients
 logit_model_multivariable <- glm(num ~ ., data = heart_data, family = binomial)
 summary(logit_model_multivariable)$coefficients
 ```
+En el modelo multivariado ajustado, se observa que las variables ´sex´, ´cp´,´trestbps´, ´exang´, ´ca´ y ´thal´ son significativas según el test de Wald,  con valores p < 0.05, lo que indica que tienen un impacto significativo en la presencia de enfermedad cardíaca. Por otro lado, las variables ´age´, ´chol´, ´fbs´,´restecg´, ´thalach´, ´oldpeak´ y ´slope´ no son significativas con valores p >= 0.05, lo que sugiere que no contribuyen de manera significativa a la predicción de la enfermedad cardíaca. 
+
 
 ## Literal 5
 
@@ -200,6 +203,9 @@ ggplot(heart_data, aes(x = prob_pred, y = num)) +
   theme(legend.position = "none") +
   scale_color_manual(values = c("0" = "black", "1" = "gray"))
 ```
+¿Describe el modelo la presencia de enfermedad cardíaca?
+Sí, el modelo multivariado describe la presencia de enfermedad cardíaca en este conjunto de datos. 
+Los puntos negros (ausencia de enfermedad cardíaca) se concentran principalmente en la región inferior izquierda del gráfico, donde las probabilidades predichas son bajas, mientras que los puntos grises (presencia de enfermedad cardíaca) se concentran principalmente en la región superior derecha del gráfico, donde las probabilidades predichas son altas. Esto indica que el modelo es capaz de diferenciar entre los casos de enfermedad cardíaca presente y ausente. La curva de regresión logística aumenta gradualmente a medida que aumenta la probabilidad predicha, lo que indica que el modelo predice una mayor probabilidad de enfermedad cardíaca a medida que aumenta la probabilidad predicha. El gráfico no muestra una superposición significativa entre los puntos negros y grises. Esto sugiere que el modelo es capaz de separar las dos categorías de enfermedad cardíaca.
 
 # Problema 3
 
