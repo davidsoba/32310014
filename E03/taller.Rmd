@@ -2,9 +2,9 @@
 title: "Taller 3"
 subtitle: "Análisis Avanzado de Datos"
 author: "Geraldine Home Saenz - Jose David Soba Loaiza"
-date: "2024-05-15"
+date: "2024-05-17"
 output: rmdformats::downcute
-# bibliography: referencias.bib
+bibliography: referencias.bib
 link-citations: true
 ---
 
@@ -15,16 +15,74 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r, message=FALSE, warning=FALSE}
 # Librerías
 library(tidyverse)
+library(readxl)
+library(ROCR)
 library(mice)
 ```
 
 # Problema 1
 
-Una familia de distribuciones $P_\theta$ con $\theta \in \Theta$ pertenece a la familia exponencial de distribuciones si si $fmp/fdp$ puede escribirse como:
+Una familia de distribuciones $P_\theta$ con $\theta \in \Theta$ pertenece a la familia exponencial de distribuciones si si fmp/fdp puede escribirse como:
 
 $$p(x|\eta)=h(x)\exp\left(\eta(\theta)t(x)-a(\theta)\right)$$
 
 Para funciones reales $h(x)$, $a(\theta)$ y $t(x)$. Muestre que tanto la distribución Bernoulli (utilizada para la regresión logística), la distribución normal (utilizada en la regresión lineal) y la distribución Poisson (utilizada en la regresión Poisson sobre conteos) pertenece a esta familia de distribuciones.
+
+Tomado de: [@bib01].
+
+## Distribución Bernoulli
+
+La distribución Bernoulli es una distribución de probabilidad discreta que toma el valor 1 con probabilidad $\theta$ y el valor $0$ con probabilidad $1-\theta$. La función de masa de probabilidad (fmp) de esta distribución se puede expresar como:
+
+$$p(x|\theta)=\binom{n}{x}\theta^x(1-\theta)^{n-x}; x = 0,1,...,n$$
+
+$$p(x|\theta)=\binom{n}{x}\exp\left(log\left(\frac{\theta}{1-\theta}\right)x+nlog(1-\theta)\right)$$
+
+Donde:
+
+- $h(x)=\binom{n}{x}$
+
+- $\eta(\theta)=log\left(\frac{\theta}{1-\theta}\right)$
+
+- $t(x)=x$
+
+- $a(\theta)=nlog(1-\theta)$
+
+## Distribución Normal
+
+La distribución normal es una distribución de probabilidad continua que se caracteriza por su forma de campana. La función de densidad de probabilidad (fdp) de esta distribución se puede expresar como:
+
+$$p(x|\theta)=\frac{1}{\sqrt{2\pi\sigma^{2}}}e^{-\frac{1}{2\sigma^{2}}(x-\mu)^{2}}$$
+
+$$p(x|\theta)=\left(\frac{1}{\sqrt{2\pi\sigma^{2}}}\exp\left(-\frac{x^{2}}{2\sigma^{2}}\right)\right)x\exp\left(\frac{\mu}{\sigma^{2}}x-\frac{\mu^{2}}{2\sigma^{2}}\right)$$
+
+Donde:
+
+- $h(x)=\left(\frac{1}{\sqrt{2\pi\sigma^{2}}}\exp\left(-\frac{x^2}{2\sigma^2}\right)\right)$
+
+- $\eta(\theta)=\frac{\mu}{\sigma^{2}}$
+
+- $t(x)=x$
+
+- $a(\theta)=\frac{\mu^{2}}{2\sigma^{2}}$
+
+## Distribución Poisson
+
+La distribución Poisson es una distribución de probabilidad discreta que se utiliza para modelar el número de eventos que ocurren en un intervalo de tiempo o espacio fijo. La fmp de esta distribución se puede expresar como:
+
+$$p(x|\theta)=\frac{\theta^{x}}{x!}e^{-\theta}; x = 0,1,2,...$$
+
+$$p(x|\theta)=\frac{1}{x!}\exp\left(\log(\theta)x-\theta\right)$$
+
+Donde:
+
+- $h(x)=\frac{1}{x!}$
+
+- $\eta(\theta)=\log(\theta)$
+
+- $t(x)=x$
+
+- $a(\theta)=\theta$
 
 # Problema 2
 
@@ -70,6 +128,17 @@ sum(is.na(heart_data))
 
 ```{r warning=FALSE, fig.height=20, fig.width=20}
 # Covariables categóricas
+heart_data <- heart_data %>%
+  mutate(sex = as.factor(sex),
+         cp = as.factor(cp),
+         fbs = as.factor(fbs),
+         restecg = as.factor(restecg),
+         exang = as.factor(exang),
+         slope = as.factor(slope),
+         ca = as.numeric(ca),
+         thal = as.integer(thal)) %>%
+  mutate(thal = as.factor(thal))
+
 categoricas <- c("sex", "cp", "fbs", "restecg", "exang", "slope", "thal")
 
 # Gráficos
@@ -133,7 +202,7 @@ summary(logit_model)$coefficients
 ```{r}
 # Modelo multivariado
 logit_model_multivariable <- glm(num ~ ., data = heart_data, family = binomial)
-summary(logit_model_multivariable)$coefficients
+printCoefmat(coef(summary(logit_model_multivariable)))
 ```
 
 ## Literal 5
@@ -159,6 +228,46 @@ ggplot(heart_data, aes(x = prob_pred, y = num)) +
 
 El conjunto de datos `ADD-taller03.xlsx` contiene la predicción de incumplimiento de pago de tarjeta de crédito bajo dos modelos logísticos diferentes para un total de 9080 clientes. Se cuenta además con la variable de incumplimiento observada al finalizar el periodo. ¿Cuál de los dos modelos logísticos tiene mayor poder de predicción? Explique con fundamento estadístico su resultado.
 
+```{r}
+# Datos
+taller_data <- read_excel("data/AAD-taller03.xlsx")
+
+# Conteo de casos positivos y negativos en incumplimiento
+table(taller_data$Incumplimiento)
+```
+
+La variable `Incumplimiento` registra 4.450 casos negativos (0), equivalentes al 49,2% del total, y 4.630 casos positivos (1), que representan el 50,8%. Esta distribución muestra un equilibrio general con una leve inclinación hacia los casos positivos
+
+A continuación, se procede a evaluar el poder de predicción de los dos modelos logísticos A y B teniendo en cuenta la curva ROC y el área bajo la curva (AUC) para cada uno de los modelos.
+
+```{r fig.height=6, fig.width=12}
+# Modelo Logístico A
+pred1 <- prediction(taller_data$ScoreLogisticoA, taller_data$Incumplimiento)
+perf1 <- performance(pred1, "tpr", "fpr")
+
+# Modelo Logístico B
+pred2 <- prediction(taller_data$ScoreLogisticoB, taller_data$Incumplimiento)
+perf2 <- performance(pred2, "tpr", "fpr")
+
+# Curvas ROC
+par(mfrow = c(1, 2))
+plot(perf1, colorize = FALSE, main = "Modelo Logístico A")
+plot(perf2, colorize = FALSE, main = "Modelo Logístico B")
+
+# AUC
+## Modelo Logístico A
+auc1 <- format(performance(pred1, "auc")@y.values[[1]], digits = 2)
+auc1
+
+## Modelo Logístico B
+auc2 <- format(performance(pred2, "auc")@y.values[[1]], digits = 2)
+auc2
+```
+
+El **modelo logístico A** supera al modelo logístico B en términos de sensibilidad y especificidad, lo que se comprueba mediante sus áreas bajo la curva ROC (AUC) de 0,61 y 0,32, respectivamente. Estadísticamente, el modelo A presenta un mejor poder de predicción debido a su mayor AUC.
+
+Sin embargo, cabe destacar que, si bien el modelo A tiene un mejor rendimiento, aún se considera moderado en cuanto a su poder predictivo. Según [@bib02], una curva ROC ideal se ubicaría lo más cerca posible de la esquina superior izquierda, indicando un clasificador con alta tasa de recuperación (TFR) y baja tasa de falsos positivos (FPR). En este caso, el modelo A, con un AUC cercano a 0,5, se podría considerar algo mejor que un clasificador aleatorio, pero no un clasificador ideal.
+
 # Problema 4
 
 Repita el problema 2, pero en lugar de imputar los datos mediante la mediana en el literal 1, utilice el algoritmo EM.
@@ -180,13 +289,33 @@ heart_data <- heart_data %>%
 
 **Imputar datos:** El conjunto de datos tiene datos perdidos en algunas variables. Estos están notados con un "?". Impute los valores perdidos utilizando el algoritmo EM.
 
-```{r warning=FALSE, message=FALSE}
-# Imputación de datos con el algoritmo EM
-heart_data <- mice(heart_data, m = 1, method = "norm.boot", maxit = 50, seed = 123)
-heart_data <- complete(heart_data)
+```{r}
+# Valores nulos
+colSums(heart_data == "?")
 
-# Validación de valores nulos
-sum(is.na(heart_data))
+# Frecuencia de valores en las variables 'ca' y 'thal'
+table(heart_data$ca)
+table(heart_data$thal)
+```
+
+Dado que los valores nulos se encuentran en las variables `ca` y `thal`, de tipo `integer` y `Categorical` respectivamente, se procede a imputar los valores nulos utilizando el algoritmo EM (*Expectation-Maximization*, por sus siglas en inglés) bajo un método que permita capturar la estructura de los mismos. De acuerdo con la documentación de la librería `mice` [@bib03], existen varios métodos a través de los cuales pueden imputarse los valores nulos. La aplicación de estos métodos dependerá de la naturaleza de los datos y su tipo de escala (factor, numérica). En el caso de la variable `ca`, se utilizará el método `pmm` (*Predictive Mean Matching*) y para la variable `thal` se utilizará el método `polyreg` (*Polytomous Regression*).
+
+
+```{r warning=FALSE, message=FALSE}
+# Valores "?" a NA
+heart_data <- heart_data %>%
+  mutate_all(~ifelse(. == "?", NA, .)) %>%
+  mutate(ca = as.numeric(ca), thal = as.integer(thal)) %>%
+  mutate(thal = as.factor(thal))
+
+# Definir el método de imputación para cada variable
+meth <- make.method(heart_data)
+meth[c("ca")] <- "pmm"
+meth[c("thal")] <- "polyreg"
+
+# Imputar los datos faltantes utilizando el algoritmo EM
+imp <- mice(heart_data, method = meth, seed = 22112)
+heart_data <- complete(imp)
 ```
 
 ## Literal 2
@@ -195,6 +324,14 @@ sum(is.na(heart_data))
 
 ```{r warning=FALSE, fig.height=20, fig.width=20}
 # Covariables categóricas
+heart_data <- heart_data %>%
+  mutate(sex = as.factor(sex),
+         cp = as.factor(cp),
+         fbs = as.factor(fbs),
+         restecg = as.factor(restecg),
+         exang = as.factor(exang),
+         slope = as.factor(slope))
+
 categoricas <- c("sex", "cp", "fbs", "restecg", "exang", "slope", "thal")
 
 # Gráficos
@@ -252,7 +389,7 @@ summary(logit_model)$coefficients
 ```{r}
 # Modelo multivariado
 logit_model_multivariable <- glm(num ~ ., data = heart_data, family = binomial)
-summary(logit_model_multivariable)$coefficients
+printCoefmat(coef(summary(logit_model_multivariable)))
 ```
 
 ## Literal 5
@@ -273,3 +410,5 @@ ggplot(heart_data, aes(x = prob_pred, y = num)) +
   theme(legend.position = "none") +
   scale_color_manual(values = c("0" = "black", "1" = "gray"))
 ```
+
+# Referencias
