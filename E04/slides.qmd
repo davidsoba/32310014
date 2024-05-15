@@ -1,0 +1,322 @@
+---
+title: "Regresión Poisson"
+subtitle: "Modelo Lineal Generalizado"
+format: 
+  revealjs:
+    slide-number: true
+    logo: images/macc.png
+    footer: "Análisis Avanzado de Datos"
+editor: visual
+---
+
+# Contenido {.smaller}
+
+<!-- 1.  Modelo Lineal Generalizado
+2.  Regresión Poisson
+3.  Ejemplo
+4.  Conclusiones
+5.  Referencias -->
+
+## Modelos de Regresión Lineal {.smaller}
+
+::: {.notes}
+Un modelo estadístico consta de un **componente aleatorio** y un **componente sistemático**. El componente aleatorio se refiere a la variabilidad en los datos, mientras que el componente sistemático se refiere a la relación entre las variables independientes y la variable dependiente.
+:::
+
+Un modelo de regresión asume que la respuesta media $\mu_{i}$ para la observación $i$ depende de $p$ variables independientes $x_{1i}$ a $x_{pi}$, a través de una función $f$ con una serie de parámetros de regresión $\beta_{j}$ (para $j =1,0,...q$). De tal manera que el **componente sistemático** de una regresión lineal se puede expresar como:
+
+$$E[y_{i}] = \mu_{i} = f(\beta_{0} + \beta_{1}x_{1i} + ... + \beta_{p}x_{pi})$$
+
+Mientras que el **componente aleatorio** asume que la variable dependiente $y_{i}$ sigue una distribución normal con media $\mu_{i}$ y varianza constante $\sigma^{2}$:
+
+$$y_{i} \sim N(\mu_{i}, \sigma^{2})$$
+
+::: {.notes}
+El componente aleatorio para la regresión lineal asume que la varianza $\sigma^{2}$ de las respuestas $y_{i}$ es constante cerca de la media $\mu_{i}$. En otras palabras se asume que las respuestas $y_{i}$ se distribuyen normalmente alrededor de la media $\mu_{i}$ con una varianza constante $\sigma^{2}$
+
+Para los modelos lineales, la función $f$ es la función identidad, $f(x) = x$. Para los modelos no lineales, la función $f$ puede ser cualquier función no lineal.
+:::
+
+## Modelos Lineales Generalizados {.smaller}
+
+Un Modelo Lineal Generalizado (GLM, pos sus siglas en inglés) asume que la respuesta media $\mu_{i}$ para la observación $i$ depende de $p$ variables independientes $x_{1i}$ a $x_{pi}$, a través de una función $g$ con una serie de parámetros de regresión $\beta_{j}$ (para $j =1,0,...q$). De tal manera que el **componente sistemático** de un GLM se puede expresar como:
+
+$$g(\mu_{i}) = \beta_{0} + \beta_{1}x_{1i} + ... + \beta_{p}x_{pi}$$
+
+o alternativamente:
+
+$$\mu_{i} = g^{(\beta_{0} + \beta_{1}x_{1i} + ... + \beta_{p}x_{pi})}$$
+
+Donde $g()$ es llamada *link function*. Que es una función monotónica y diferenciable (como una función logarítmica).
+
+El **componente aleatorio** se explica asumiendo que la variable dependiente $y_{i}$ sigue una distribución de una familia específica de distribuciones de probabilidad, llamadas Modelos de Dispersión Exponencial (EDM, por sus siglas en inglés), que incluye distribuciones comunes como la normal, Poisson y el binomio como casos especiales.
+
+::: {.notes}
+-   GLM, por sus siglas en inglés, es una extensión del modelo lineal.
+-   Es un marco unificado para modelar variables de respuesta que no siguen una distribución normal.
+-   El modelo lineal generalizado se compone de tres componentes:
+    -   Una función de enlace.
+    -   Una función de distribución.
+    -   Un término de error.
+
+-   La regresión Poisson es un modelo lineal generalizado que se utiliza para modelar variables de conteo.
+-   La regresión Poisson es una extensión de la regresión lineal.
+-   La regresión Poisson se utiliza cuando la variable dependiente es un conteo de eventos.
+-   La regresión Poisson se utiliza para modelar la relación entre una variable dependiente de conteo y una o más variables independientes.
+:::
+
+## GLMs Poisson {.smaller}
+
+El minero ruidoso es una ave nativa australiana pequeña pero peligrosa. Un estudio del hábitat de estas aves registró su abundancia en un transecto ^[Corte transversal de un terreno] de dos hectareas ubicadas en parches de bosque de eucaliptos en Wimmera, al oeste de Victoria, Australia.
+
+::: {.notes}
+El objetivo del estudio era determinar si la abundancia de mineros ruidosos estaba relacionada con la cantidad de eucaliptos en el bosque.
+:::
+
+:::: {.columns}
+
+::: {.column width="40%"}
+```{r}
+#| echo: false
+#| align: center
+
+library(GLMsData)
+data(nminer)
+
+# Muestra una table con solo los valores de Minerab y Eucs de las primeras 6 observaciones
+nminer[, c("Eucs", "Minerab")]
+```
+:::
+
+::: {.column width="60%"}
+
+```{r fig.width=6, fig.height=4}
+#| echo: false
+#| fig.align: center
+
+library(GLMsData); data(nminer)
+plot( jitter(Minerab) ~ Eucs, data=nminer, las=1, ylim=c(0, 20),
+ xlab="Number of eucalypts per 2 ha", ylab="Number of noisy miners" )
+```
+:::
+::::
+
+::: {.notes}
+El número de mineros ruidosos (observados en dos hectáreas son transectos en zonas boscosas dentro de las llanuras de Wimmera del oeste de Victoria, Australia) se compara con el número de eucaliptos. Se añade una pequeña cantidad de aleatoriedad al número de mineros en la dirección vertical para evitar observaciones sobretrazadas
+:::
+
+## GLMs Poisson {.smaller}
+
+::: {.notes}
+El componente aleatorio ciertamente no tiene una varianza constante, ya que las observaciones están más dispersas para un mayor número de eucaliptos. Por lo tanto, un modelo lineal no sería apropiado para estos datos.
+:::
+
+Debido a que la respuestas son variables de conteo, una **distribución Poisson** con media $\mu_{i}$ para la observación $i$ puede ser adecuada para modelar la relación entre la cantidad de eucaliptos y la abundancia de mineros ruidosos. Cuyo componente aleatorio estaría dado por:
+
+$$y_{i} \sim Poisson(\mu_{i})$$
+
+Donde $\mu_{i}>0$ 
+
+La relación entre $\mu$ y el número de eucaliptos tampoco parece ser lineal. Así que un posible modelo para el componente sistemático sería:
+
+$$E[y_{i}] = \mu_{i} = \exp(\beta_{0} + \beta_{1}x_{i})$$
+
+Donde $x_{i}$ es el número de eucaliptos en la ubicación $i$.
+
+::: {.notes}
+-   La regresión Poisson es un modelo lineal generalizado que se utiliza para modelar variables de conteo.
+-   La regresión Poisson se utiliza para modelar la relación entre una variable dependiente de conteo y una o más variables independientes.
+-   La regresión Poisson se utiliza cuando la variable dependiente es un conteo de eventos.
+-   La regresión Poisson se utiliza para modelar la relación entre una variable dependiente de conteo y una o más variables independientes.
+:::
+
+## GLMs Poisson {.smaller}
+
+La función de enlace más comunmente utilizada para los GMLs de Poisson es la función logarítmica, la cual garantiza que $\mu>0$ y permite que la interpretación de efectos multiplicadores en la interpretación de los parámetros de regresión. Con esto la forma general de un modelo de regresión Poisson estaría dada por:
+
+$$\begin{cases} & y \sim Poisson(\mu) \hspace{1cm} \text{Componente aleatorio}  \\ & log\mu = \beta_{0} + \beta_{1}x_{1} + ... + \beta_{p}x_{p} \hspace{1cm} \text{Componente sistemático} \end{cases}$$
+
+El componente sistemático también se puede expresar como:
+
+$$\mu = \exp(\beta_{0} + \beta_{1}x_{1} + ... + \beta_{p}x_{p})$$
+
+o
+
+$$\mu = \exp\beta_{0} \cdot (\exp\beta_{1})^{x_{1}} \cdot ... \cdot (\exp\beta_{p})^{x_{p}}$$
+
+Esto demuestra que el impacto de cada variable independiente es multiplicativo. Al aumentar $x_{j}$ en una unidad, aumenta $\mu$ en el factor $\exp\beta_{j}$. Si $\beta_{j} = 0$, entonces no hay efecto de $x_{j}$ en $\mu$.
+
+## GLMs Poisson {.smaller}
+
+- Cuando las variables independientes son cualitativas (es decir, factores), los datos pueden resumirse como una tabla de contingencia y el modelo suele denominarse **modelo logarítmico lineal** o ***log-lin model***.
+
+- Cuando alguna de las variables independientes es cuantitativa, el modelo suele llamarse **modelo de regresión Poisson**.
+
+## Regresión Poisson {.smaller}
+
+Un modelo de regresión Poisson se ajusta a los datos utilizando el método de máxima verosimilitud. La función de verosimilitud para un modelo de regresión Poisson es:
+
+$$L(\beta) = \prod_{i=1}^{n} \frac{\exp(-\mu_{i}) \mu_{i}^{y_{i}}}{y_{i}!}$$
+
+Donde $\mu_{i} = \exp(\beta_{0} + \beta_{1}x_{1i} + ... + \beta_{p}x_{pi})$ y $y_{i}$ es el valor observado de la variable dependiente para la observación $i$.
+
+El objetivo es encontrar los valores de $\beta_{0}, \beta_{1}, ..., \beta_{p}$ que maximizan la función de verosimilitud. Esto se puede hacer utilizando un algoritmo de optimización, como el método de Newton-Raphson.
+
+## Regresión Poisson
+
+```{r}
+#| echo: true
+
+library(GLMsData); data(nminer)
+nm.m1 <- glm( Minerab ~ Eucs, data=nminer, family=poisson)
+printCoefmat(coef(summary(nm.m1)))
+```
+
+## Regresión Poisson
+
+```{r fig.width=10, fig.height=8}
+#| echo: false
+#| fig.align: center
+
+library(statmod)
+qr <- qresid(nm.m1)
+
+maxhat <- which.max(hatvalues(nm.m1))
+maxqr <- which.max(abs(qr))
+maxinfl <- which.max(cooks.distance(nm.m1))
+
+par(mfrow=c(2,2))
+qqnorm(qr, las=1); qqline(qr)
+theoretical_quantiles <- qnorm((1:length(qr) - 0.5) / length(qr))
+sample_quantiles <- sort(qr)
+points(theoretical_quantiles[maxhat], sample_quantiles[maxhat], col="red", pch=19)
+points(theoretical_quantiles[maxqr], sample_quantiles[maxqr], col="blue", pch=19)
+
+
+plot( qr ~ sqrt(fitted(nm.m1)), las=1)
+points(sqrt(fitted(nm.m1))[maxqr], qr[maxqr], pch=19, cex=2)
+points(sqrt(fitted(nm.m1)[maxhat]), qr[maxhat], pch=15, cex=2)
+points(sqrt(fitted(nm.m1)[maxinfl]), qr[maxinfl], pch=17, cex=2)
+
+plot(cooks.distance(nm.m1), type="h", las=1)
+points(maxqr, cooks.distance(nm.m1)[maxqr], pch=19, cex=2)
+points(maxhat, cooks.distance(nm.m1)[maxhat], pch=15, cex=2)
+points(maxinfl, cooks.distance(nm.m1)[maxinfl], pch=17, cex=2)
+
+plot(hatvalues(nm.m1), type="h", las=1)
+points(maxqr, hatvalues(nm.m1)[maxqr], pch=19, cex=2)
+points(maxhat, hatvalues(nm.m1)[maxhat], pch=15, cex=2)
+points(maxinfl, hatvalues(nm.m1)[maxinfl], pch=17, cex=2)
+```
+
+## Ejemplo {.smaller}
+
+::: {.notes}
+El conjunto de datos `lungcap`, del paquete `GLMsData`, explora la relación entre la capacidad pulmonar (medida a través del Volumen Respiratorio Forzado, FEV por sus siglas en inglés, en litros), la edad, altura y genero de 654 estudiantes del Este de Boston que fumaron y no durante mediados y finales de la década de 1970.
+:::
+
+```{r}
+#| echo: true
+
+library(GLMsData)
+data(lungcap)
+head(lungcap)
+str(lungcap)
+summary(lungcap)
+
+lungcap$Smoke <- factor(lungcap$Smoke, levels = c(0, 1), labels = c("Non-smoker", "Smoker"))
+summary(lungcap$Smoke)
+```
+
+----
+
+```{r fig.width=10, fig.height=8}
+#| echo: false
+#| fig-align: center
+
+par(mfrow=c(2,2))
+
+plot( FEV ~ Age, data=lungcap,
+ xlab="Age (in years)",
+ ylab="FEV (in L)",
+ main="FEV vs age",
+ xlim=c(0, 20),
+ ylim=c(0, 6),
+ las=1)
+
+ plot( FEV ~ Ht, data=lungcap, main="FEV vs height",
+ xlab="Height (in inches)", ylab="FEV (in L)",
+ las=1, ylim=c(0, 6) )
+
+ plot( FEV ~ Gender, data=lungcap,
+ main="FEV vs gender", ylab="FEV (in L)",
+ las=1, ylim=c(0, 6))
+
+ plot( FEV ~ Smoke, data=lungcap, main="FEV vs Smoking status",
+ ylab="FEV (in L)", xlab="Smoking status",
+ las=1, ylim=c(0, 6))
+```
+
+----
+```{r fig.width=10, fig.height=8}
+#| echo: false
+#| fig-align: center
+
+par(mfrow=c(2,2))
+
+plot(FEV~Age,
+ data=subset(lungcap,Smoke=="Smoker"), # Onlyselectsmokers
+ main="FEVvsage\nforsmokers", # \nmeans`newline'
+ ylab="FEV(inL)",xlab="Age(inyears)",
+ ylim=c(0,6),xlim=c(0,20),las=1)
+
+plot(FEV~Age,
+ data=subset(lungcap,Smoke=="Non-smoker"), #Onlyselectnon-smokers
+ main="FEVvsage\nfornon-smokers",
+ ylab="FEV(inL)",xlab="Age(inyears)",
+ ylim=c(0,6),xlim=c(0,20),las=1)
+
+plot(FEV~Ht,data=subset(lungcap,Smoke=="Smoker"),
+ main="FEVvsheight\nforsmokers",
+ ylab="FEV(inL)",xlab="Height(ininches)",
+ xlim=c(45,75),ylim=c(0,6),las=1)
+
+plot(FEV~Ht,data=subset(lungcap,Smoke=="Non-smoker"),
+ main="FEVvsheight\nfornon-smokers",
+ ylab="FEV(inL)", xlab="Height(ininches)",
+ xlim=c(45,75),ylim=c(0,6),las=1)
+```
+
+----
+```{r fig.width=10, fig.height=8}
+#| echo: false
+#| fig-align: center
+
+AgeAdjust <- lungcap$Age + ifelse(lungcap$Smoke=="Smoker", 0, 0.5)
+
+par(mfrow=c(2,2))
+
+plot( FEV ~ AgeAdjust, data=lungcap,
+ pch = ifelse(Smoke=="Smoker", 3, 20),
+ xlab="Age (in years)", ylab="FEV (in L)", main="FEV vs age", las=1)
+legend("topleft", pch=c(20, 3), legend=c("Non-smokers","Smokers") )
+
+boxplot(lungcap$FEV ~ lungcap$Smoke + lungcap$Gender,
+ ylab="FEV (in L)", main="FEV, by gender\n and smoking status",
+ xlab="",
+ las=2,
+ # Keeps labels perpendicular to the axes
+ names=c("F:\nNon", "F:\nSmoker", "M:\nNon", "M:\nSmoker"))
+
+
+interaction.plot( lungcap$Smoke, lungcap$Gender, lungcap$FEV,
+ xlab="Smoking status", ylab="FEV (in L)",
+ main="Mean FEV, by gender\n and smoking status",
+ trace.label="Gender", las=1)
+
+interaction.plot( lungcap$Smoke, lungcap$Gender, lungcap$Age,
+ xlab="Smoking status", ylab="Age (in years)",
+ main="Mean age, by gender\n and smoking status",
+ trace.label="Gender", las=1)
+```
+
