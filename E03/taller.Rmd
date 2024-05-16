@@ -214,8 +214,6 @@ logistic_model <- glm(num ~ fbs, data = heart_data, family = binomial)
 summary(logistic_model)$coefficients
 ```
 
-$$logit(\pi(x))=\begin{cases}-0.18=log(117/141)\\-0.18+0.14=log(117/141)-log(22/23)\end{cases}$$
-
 - **Intercepto**: El *odds* (en escala logarítmica) de enfermedad cuando una persona tiene una glucemia <= 120 mg/dl es de -0.18. 
 - **Pendiente**: En presencia de glucemia > 120 mg/dl aumenta (en escala logarítmica) los oods de enfermedad en 0.14.
 
