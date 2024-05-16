@@ -1,5 +1,5 @@
 ---
-title: "Taller 3 - Modelos generalizados. Regresión logística, variables latentes y datos estructurados."
+title: "Taller 3"
 subtitle: "Análisis Avanzado de Datos"
 author: "Geraldine Home Saenz - Jose David Soba Loaiza"
 date: "2024-05-17"
@@ -32,7 +32,7 @@ Tomado de: [@bib01].
 
 ## Distribución Bernoulli
 
-La distribución Bernoulli es una distribución de probabilidad discreta que toma el valor 1 con probabilidad $\theta$ y el valor $0$ con probabilidad $1-\theta$. La función de masa de probabilidad (fmp) de esta distribución se puede expresar como:
+La distribución Bernoulli es una distribución de probabilidad discreta que toma el valor 1 con probabilidad $\theta$ y el valor $0$ con probabilidad $(1-\theta)$. La función de masa de probabilidad (fmp) de esta distribución se puede expresar como:
 
 $$p(x|\theta)=\binom{n}{x}\theta^x(1-\theta)^{n-x}; x = 0,1,...,n$$
 
@@ -161,7 +161,9 @@ for (var in categoricas) {
 
 ```
 
-Se observa una diferencia significativa en la proporción de enfermedad cardíaca entre hombres y mujeres, donde la proporción de casos positivos es más alta en hombres que en mujeres. En cuanto al tipo de dolor en el pecho reportado, se evidencia una variabilidad en la proporción de enfermedad cardíaca, siendo los pacientes con dolor de pecho atípico (valor 2) o asintomáticos (valor 4) los que tienen una mayor proporción de casos positivos para enfermedad cardíaca. Por otro lado, no parece haber una diferencia significativa en la proporción de enfermedad cardíaca entre pacientes con azúcar en sangre en ayunas mayor o igual a 120 mg/dl (valor 1) y aquellos con azúcar en sangre en ayunas menor a 120 mg/dl (valor 0). Además, la proporción de enfermedad cardíaca parece variar según los resultados electrocardiográficos en reposo, la presencia de angina inducida por el ejercicio y la pendiente del segmento ST durante el ejercicio.Respecto al resultado del test de talio, se observa una variabilidad en la proporción de enfermedad cardíaca, siendo los pacientes con un resultado de talio 7 los que parecen tener una mayor proporción de casos positivos para enfermedad cardíaca.
+El desbalance en las covariables categóricas como `sex`, `cp`, `fbs`, `restecg`, `exang` y `thal` señala un posible inconveniente en el análisis, donde ciertas categorías tienen un número significativamente mayor de observaciones que otras, lo que podría impactar en la precisión y el rendimiento de modelos posteriores.
+
+Asimismo, la superposición en la distribución de categorías de variables como `cp` y `fbs` sugiere proporciones relativamente similares de individuos con y sin enfermedad cardíaca, lo que podría indicar que estas variables podrían tener una relación más débil o más compleja con el resultado. En el caso de `fbs`, aunque el nivel de azúcar en la sangre en ayunas es relevante para la salud cardíaca, pueden existir otros factores, como la dieta y el estilo de vida, que también influyen en la relación entre `fbs` y la enfermedad cardíaca. Por otro lado, en el caso de `cp`, la variabilidad en la presentación de síntomas indica que diferentes tipos de dolor en el pecho pueden ser experimentados tanto por individuos con enfermedad cardíaca como por aquellos sin ella, lo que complica la relación entre esta variable y el resultado. 
 
 ## Literal 3
 
@@ -176,21 +178,48 @@ contingencia
 
 # Probabilidades
 prob_enfermedad_no_fbs <- contingencia[1, 2] / sum(contingencia[1, ])
+prob_enfermedad_no_fbs
 prob_enfermedad_si_fbs <- contingencia[2, 2] / sum(contingencia[2, ])
+prob_enfermedad_si_fbs
 
 # odds
 odds_enfermedad_no_fbs <- contingencia[1, 2] / contingencia[1, 1]
+odds_enfermedad_no_fbs
 odds_enfermedad_si_fbs <- contingencia[2, 2] / contingencia[2, 1]
-odd_ratio_enfermedad <- odds_enfermedad_no_fbs / odds_enfermedad_si_fbs
-log_odd_ratio_enfermedad <- log(odds_enfermedad_no_fbs) - log(odds_enfermedad_si_fbs)
-```
+odds_enfermedad_si_fbs
 
+# odds ratio
+odds_ratio_enfermedad_no_fbs <- odds_enfermedad_no_fbs / odds_enfermedad_si_fbs
+odds_ratio_enfermedad_no_fbs
+odds_ratio_enfermedad_si_fbs <- odds_enfermedad_si_fbs / odds_enfermedad_no_fbs
+odds_ratio_enfermedad_si_fbs
+
+# log odds ratio
+log_odds_ratio_enfermedad_no_fbs <- log(odds_enfermedad_no_fbs)
+log_odds_ratio_enfermedad_no_fbs
+log_odds_ratio_enfermedad_si_fbs <- log(odds_enfermedad_si_fbs) 
+log_odds_ratio_enfermedad_si_fbs
+log_odds_ratio_enfermedad <- log(odds_enfermedad_si_fbs) - log(odds_enfermedad_no_fbs)
+log_odds_ratio_enfermedad
+```
+Para personas con niveles de glucemia <= 120 mg/dl, la probabilidad de tener enfermedad cardíaca es aproximadamente 0.45, mientras que para aquellos con niveles de glucemia > 120 mg/dl, la probabilidad aumenta ligeramente, siendo aproximadamente 0.48. **Estas probabilidades sugieren que puede haber más o menos la misma probabilidad de tener o no la enfermedad en presencia de glucemia > 120 mg/dl o de glucemia <= 120 mg/dl**. 
+
+Los odds de tener enfermedad cardíaca muestran valores similares según los niveles de glucemia. Para personas con niveles de glucemia <= 120 mg/dl, el odds de tener enfermedad cardíaca es aproximadamente 0.83. Para aquellos con niveles de glucemia > 120 mg/dl, el odds es a aproximadamente 0.95. **Al igual que con las probabilidades, los odds cercanos a 1 sugieren que puede haber mas o menos la misma probabilidad de tener o no la enfermedad en los dos niveles de glucemia.**
+
+Por otra parte, el odds ratio de tener enfermedad cardíaca para personas con niveles de glucemia > 120 mg/dl en comparación con aquellos con niveles de glucemia <= 120 mg/dl es aproximadamente 1.15. Mientras que el odds ratio de tener enfermedad cardíaca con niveles de glucemia <= 120 mg/dl en comparación con aquellos con niveles de glucemia > 120 mg/dl es de aproximadamente 0.86. **Los valores de estos odds ratio, al ser cercanos a 1, sugieren que la covariable `fbs` puede no ser informativa (da lo mismo en termino de odds de enfermedad).**
 
 ```{r}
 # Modelo bivariado
-logit_model <- glm(num ~ fbs, data = heart_data, family = binomial)
-summary(logit_model)$coefficients
+logistic_model <- glm(num ~ fbs, data = heart_data, family = binomial)
+summary(logistic_model)$coefficients
 ```
+
+$$logit(\pi(x))=\begin{cases}-0.18=log(117/141)\\-0.18-0.14=log(117/141)-log(22/23)\end{cases}$$
+
+- **Intercepto**: El *odds* (en escala logarítmica) de enfermedad cuando una persona tiene una glucemia <= 120 mg/dl es de -0.18. 
+- **Pendiente**: En presencia de glucemia > 120 mg/dl aumenta (en escala logarítmica) los oods de enfermedad en -0.14.
+
+En general, el modelo bivariado indica que la covariable `fbs` no tiene un impacto significativo para predecir la enfermedad cardíaca. Esto de acuerdo con el análisis que se realizó manualmente, donde se observó que los odds ratio son cercanos a 1 y, en el modelo ajustado, donde el coeficiente asociado a esta variable no es significativo (p > 0.05).
 
 ## Literal 4
 
@@ -198,11 +227,10 @@ summary(logit_model)$coefficients
 
 ```{r}
 # Modelo multivariado
-logit_model_multivariable <- glm(num ~ ., data = heart_data, family = binomial)
-printCoefmat(coef(summary(logit_model_multivariable)))
+logistic_model_multivariable <- glm(num ~ ., data = heart_data, family = binomial)
+printCoefmat(coef(summary(logistic_model_multivariable)))
 ```
-En el modelo multivariado ajustado, se observa que las variables ´sex´, ´cp´,´trestbps´, ´exang´, ´ca´ y ´thal´ son significativas según el test de Wald,  con valores p < 0.05, lo que indica que tienen un impacto significativo en la presencia de enfermedad cardíaca. Por otro lado, las variables ´age´, ´chol´, ´fbs´,´restecg´, ´thalach´, ´oldpeak´ y ´slope´ no son significativas con valores p >= 0.05, lo que sugiere que no contribuyen de manera significativa a la predicción de la enfermedad cardíaca. 
-
+En el modelo multivariado ajustado, se observa que tanto el intercepto como las variables: `sex1`, `cp4`,`trestbps`, `slope2`, `ca` y `thal7`, son significativas según el test de Wald,  con valores p < 0.05, lo cual indica que es poco probable que los coeficientes asociados a estas variables sean iguales a cero por casualidad. Por el contrario, las variables:`age`, `cp2`, `cp3`, `chol`, `fbs1`,`restecg1`,`restecg2`, `thalach`, `exang1`, `oldpeak`, `slope3` y `thal6`, no son significativas con valores p > 0.05, lo cual sugiere que no hay evidencia suficiente para rechazar la hipótesis nula de que los coeficientes asociados a estas variables son iguales a cero.
 
 ## Literal 5
 
@@ -211,7 +239,7 @@ En el modelo multivariado ajustado, se observa que las variables ´sex´, ´cp´
 ```{r warning=FALSE, message=FALSE}
 # Probabilidades predichas
 heart_data <- heart_data %>%
-  mutate(prob_pred = predict(logit_model_multivariable, type = "response"))
+  mutate(prob_pred = predict(logistic_model_multivariable, type = "response"))
 
 # Gráfico
 ggplot(heart_data, aes(x = prob_pred, y = num)) +
@@ -222,9 +250,8 @@ ggplot(heart_data, aes(x = prob_pred, y = num)) +
   theme(legend.position = "none") +
   scale_color_manual(values = c("0" = "black", "1" = "gray"))
 ```
-¿Describe el modelo la presencia de enfermedad cardíaca?
-Sí, el modelo multivariado describe la presencia de enfermedad cardíaca en este conjunto de datos. 
-Los puntos negros (ausencia de enfermedad cardíaca) se concentran principalmente en la región inferior izquierda del gráfico, donde las probabilidades predichas son bajas, mientras que los puntos grises (presencia de enfermedad cardíaca) se concentran principalmente en la región superior derecha del gráfico, donde las probabilidades predichas son altas. Esto indica que el modelo es capaz de diferenciar entre los casos de enfermedad cardíaca presente y ausente. La curva de regresión logística aumenta gradualmente a medida que aumenta la probabilidad predicha, lo que indica que el modelo predice una mayor probabilidad de enfermedad cardíaca a medida que aumenta la probabilidad predicha. El gráfico no muestra una superposición significativa entre los puntos negros y grises. Esto sugiere que el modelo es capaz de separar las dos categorías de enfermedad cardíaca.
+
+El modelo multivariado describe la presencia de enfermedad cardíaca en este conjunto de datos. Los puntos negros (ausencia de enfermedad cardíaca) se concentran principalmente en la región inferior izquierda del gráfico, donde las probabilidades predichas son bajas, mientras que los puntos grises (presencia de enfermedad cardíaca) se concentran principalmente en la región superior derecha del gráfico, donde las probabilidades predichas son altas. Esto indica que el modelo es capaz de diferenciar entre los casos de enfermedad cardíaca presente y ausente. La curva de regresión logística aumenta gradualmente a medida que aumenta la probabilidad predicha, lo que indica que el modelo predice una mayor probabilidad de enfermedad cardíaca a medida que aumenta la probabilidad predicha.
 
 # Problema 3
 
@@ -238,9 +265,9 @@ taller_data <- read_excel("data/AAD-taller03.xlsx")
 table(taller_data$Incumplimiento)
 ```
 
-La variable `Incumplimiento` registra 4.450 casos negativos (0), equivalentes al 49,2% del total, y 4.630 casos positivos (1), que representan el 50,8%. Esta distribución muestra un equilibrio general con una leve inclinación hacia los casos positivos
+La variable `Incumplimiento` registra 4.450 casos negativos (0), lo que  equivale al 49,2% del total, y 4.630 casos positivos (1), representa el 50,8%. Esta distribución indica un equilibrio general con una leve inclinación hacia los casos positivos
 
-A continuación, se procede a evaluar el poder de predicción de los dos modelos logísticos A y B teniendo en cuenta la curva ROC y el área bajo la curva (AUC) para cada uno de los modelos.
+A continuación, se procede a evaluar el poder de predicción de los dos modelos logísticos A y B, considerando la curva ROC y el área bajo la curva (AUC) para cada uno de los modelos.
 
 ```{r fig.height=6, fig.width=12}
 # Modelo Logístico A
@@ -266,9 +293,9 @@ auc2 <- format(performance(pred2, "auc")@y.values[[1]], digits = 2)
 auc2
 ```
 
-El **modelo logístico A** supera al modelo logístico B en términos de sensibilidad y especificidad, lo que se comprueba mediante sus áreas bajo la curva ROC (AUC) de 0,61 y 0,32, respectivamente. Estadísticamente, el modelo A presenta un mejor poder de predicción debido a su mayor AUC.
+El **modelo logístico A** supera al modelo logístico B en términos de sensibilidad y especificidad, lo que se comprueba mediante sus áreas bajo la curva ROC **(AUC) de 0,61** y 0,32, respectivamente. Estadísticamente, el modelo A presenta un mejor poder de predicción debido a su mayor AUC.
 
-Sin embargo, cabe destacar que, si bien el modelo A tiene un mejor rendimiento, aún se considera moderado en cuanto a su poder predictivo. Según [@bib02], una curva ROC ideal se ubicaría lo más cerca posible de la esquina superior izquierda, indicando un clasificador con alta tasa de recuperación (TFR) y baja tasa de falsos positivos (FPR). En este caso, el modelo A, con un AUC cercano a 0,5, se podría considerar algo mejor que un clasificador aleatorio, pero no un clasificador ideal.
+Sin embargo, es importante destacar que, aunque el modelo A tiene un mejor rendimiento, aún se considera moderado en cuanto a su poder predictivo. Según [@bib02], una curva ROC ideal se ubicaría lo más cerca posible de la esquina superior izquierda, indicando un clasificador con alta tasa de recuperación (TFR) y baja tasa de falsos positivos (FPR). En este caso, el modelo A, con un AUC cercano a 0,5, se podría considerar algo mejor que un clasificador aleatorio, pero no un clasificador ideal.
 
 # Problema 4
 
@@ -300,7 +327,7 @@ table(heart_data$ca)
 table(heart_data$thal)
 ```
 
-Dado que los valores nulos se encuentran en las variables `ca` y `thal`, de tipo `integer` y `Categorical` respectivamente, se procede a imputar los valores nulos utilizando el algoritmo EM (*Expectation-Maximization*, por sus siglas en inglés) bajo un método que permita capturar la estructura de los mismos. De acuerdo con la documentación de la librería `mice` [@bib03], existen varios métodos a través de los cuales pueden imputarse los valores nulos. La aplicación de estos métodos dependerá de la naturaleza de los datos y su tipo de escala (factor, numérica). En el caso de la variable `ca`, se utilizará el método `pmm` (*Predictive Mean Matching*) y para la variable `thal` se utilizará el método `polyreg` (*Polytomous Regression*).
+Dado que se identificaron valores nulos en las variables `ca` y `thal`, de tipo `Integer` y `Categorical` respectivamente, se procede a imputar los valores nulos utilizando el algoritmo EM (*Expectation-Maximization*, por sus siglas en inglés). Este método permite capturar la estructura de los datos faltantes. De acuerdo con la documentación de la librería `mice` [@bib03], existen varios métodos a través de los cuales pueden imputarse los valores nulos. La aplicación de estos métodos dependerá de la naturaleza de los datos y su tipo de escala (factor, numérica). En el caso de la variable `ca`, se aplicará el método `pmm` (*Predictive Mean Matching*) y para la variable `thal` se utilizará el método `polyreg` (*Polytomous Regression*).
 
 
 ```{r warning=FALSE, message=FALSE}
@@ -320,9 +347,11 @@ imp <- mice(heart_data, method = meth, seed = 22112)
 heart_data <- complete(imp)
 ```
 
+>**Bajo esta imputación, no se observaron cambios relevantes sobre los demás literales del problema 2. No obstante, se incluyen los códigos correspondientes, pero sin su interpretación.**
+
 ## Literal 2
 
-**Revisar las distribuciones bivariadas:** Revise la distribución de la variable respuesta para cada una de las covariables categóricas de manera bivariada. ¿Observa algún inconveniente con alguna de las variables al hacer el análisis?
+**Revisar las distribuciones bivariadas:** Revise la distribución de la variable respuesta para cada una de las covariables categóricas de manera bivariada. 
 
 ```{r warning=FALSE, fig.height=20, fig.width=20}
 # Covariables categóricas
@@ -368,20 +397,36 @@ contingencia
 
 # Probabilidades
 prob_enfermedad_no_fbs <- contingencia[1, 2] / sum(contingencia[1, ])
+prob_enfermedad_no_fbs
 prob_enfermedad_si_fbs <- contingencia[2, 2] / sum(contingencia[2, ])
+prob_enfermedad_si_fbs
 
 # odds
 odds_enfermedad_no_fbs <- contingencia[1, 2] / contingencia[1, 1]
+odds_enfermedad_no_fbs
 odds_enfermedad_si_fbs <- contingencia[2, 2] / contingencia[2, 1]
-odd_ratio_enfermedad <- odds_enfermedad_no_fbs / odds_enfermedad_si_fbs
-log_odd_ratio_enfermedad <- log(odds_enfermedad_no_fbs) - log(odds_enfermedad_si_fbs)
+odds_enfermedad_si_fbs
+
+# odds ratio
+odds_ratio_enfermedad_no_fbs <- odds_enfermedad_no_fbs / odds_enfermedad_si_fbs
+odds_ratio_enfermedad_no_fbs
+odds_ratio_enfermedad_si_fbs <- odds_enfermedad_si_fbs / odds_enfermedad_no_fbs
+odds_ratio_enfermedad_si_fbs
+
+# log odds ratio
+log_odds_ratio_enfermedad_no_fbs <- log(odds_enfermedad_no_fbs)
+log_odds_ratio_enfermedad_no_fbs
+log_odds_ratio_enfermedad_si_fbs <- log(odds_enfermedad_si_fbs) 
+log_odds_ratio_enfermedad_si_fbs
+log_odds_ratio_enfermedad <- log(odds_enfermedad_si_fbs) - log(odds_enfermedad_no_fbs)
+log_odds_ratio_enfermedad
 ```
 
 
 ```{r}
 # Modelo bivariado
-logit_model <- glm(num ~ fbs, data = heart_data, family = binomial)
-summary(logit_model)$coefficients
+logistic_model <- glm(num ~ fbs, data = heart_data, family = binomial)
+summary(logistic_model)$coefficients
 ```
 
 ## Literal 4
@@ -390,8 +435,8 @@ summary(logit_model)$coefficients
 
 ```{r}
 # Modelo multivariado
-logit_model_multivariable <- glm(num ~ ., data = heart_data, family = binomial)
-printCoefmat(coef(summary(logit_model_multivariable)))
+logistic_model_multivariable <- glm(num ~ ., data = heart_data, family = binomial)
+printCoefmat(coef(summary(logistic_model_multivariable)))
 ```
 
 ## Literal 5
@@ -401,7 +446,7 @@ printCoefmat(coef(summary(logit_model_multivariable)))
 ```{r warning=FALSE, message=FALSE}
 # Probabilidades predichas
 heart_data <- heart_data %>%
-  mutate(prob_pred = predict(logit_model_multivariable, type = "response"))
+  mutate(prob_pred = predict(logistic_model_multivariable, type = "response"))
 
 # Gráfico
 ggplot(heart_data, aes(x = prob_pred, y = num)) +
