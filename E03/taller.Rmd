@@ -214,10 +214,10 @@ logistic_model <- glm(num ~ fbs, data = heart_data, family = binomial)
 summary(logistic_model)$coefficients
 ```
 
-$$logit(\pi(x))=\begin{cases}-0.18=log(117/141)\\-0.18-0.14=log(117/141)-log(22/23)\end{cases}$$
+$$logit(\pi(x))=\begin{cases}-0.18=log(117/141)\\-0.18+0.14=log(117/141)-log(22/23)\end{cases}$$
 
 - **Intercepto**: El *odds* (en escala logarítmica) de enfermedad cuando una persona tiene una glucemia <= 120 mg/dl es de -0.18. 
-- **Pendiente**: En presencia de glucemia > 120 mg/dl aumenta (en escala logarítmica) los oods de enfermedad en -0.14.
+- **Pendiente**: En presencia de glucemia > 120 mg/dl aumenta (en escala logarítmica) los oods de enfermedad en 0.14.
 
 En general, el modelo bivariado indica que la covariable `fbs` no tiene un impacto significativo para predecir la enfermedad cardíaca. Esto de acuerdo con el análisis que se realizó manualmente, donde se observó que los odds ratio son cercanos a 1 y, en el modelo ajustado, donde el coeficiente asociado a esta variable no es significativo (p > 0.05).
 
@@ -230,6 +230,7 @@ En general, el modelo bivariado indica que la covariable `fbs` no tiene un impac
 logistic_model_multivariable <- glm(num ~ ., data = heart_data, family = binomial)
 printCoefmat(coef(summary(logistic_model_multivariable)))
 ```
+
 En el modelo multivariado ajustado, se observa que tanto el intercepto como las variables: `sex1`, `cp4`,`trestbps`, `slope2`, `ca` y `thal7`, son significativas según el test de Wald,  con valores p < 0.05, lo cual indica que es poco probable que los coeficientes asociados a estas variables sean iguales a cero por casualidad. Por el contrario, las variables:`age`, `cp2`, `cp3`, `chol`, `fbs1`,`restecg1`,`restecg2`, `thalach`, `exang1`, `oldpeak`, `slope3` y `thal6`, no son significativas con valores p > 0.05, lo cual sugiere que no hay evidencia suficiente para rechazar la hipótesis nula de que los coeficientes asociados a estas variables son iguales a cero.
 
 ## Literal 5
