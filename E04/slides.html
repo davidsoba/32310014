@@ -8,7 +8,7 @@
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
 <link href="slides_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.4.553">
+  <meta name="generator" content="quarto-1.3.326">
 
   <title>Regresión Poisson</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -30,7 +30,7 @@
     }
     /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -94,7 +94,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto.css" id="theme">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -220,8 +220,7 @@
   }
 
   .callout.callout-titled .callout-body > .callout-content > :last-child {
-    padding-bottom: 0.5rem;
-    margin-bottom: 0;
+    margin-bottom: 0.5rem;
   }
 
   .callout.callout-titled .callout-icon::before {
@@ -400,16 +399,8 @@
 <section>
 <section id="contenido" class="title-slide slide level1 smaller center">
 <h1>Contenido</h1>
-<!-- 1.  Modelo Lineal Generalizado
-2.  Regresión Poisson
-3.  Ejemplo
-4.  Conclusiones
-5.  Referencias -->
-</section>
-<section id="modelos-de-regresión-lineal" class="slide level2 smaller">
-<h2>Modelos de Regresión Lineal</h2>
 <aside class="notes">
-<p>Un modelo estadístico consta de un <strong>componente aleatorio</strong> y un <strong>componente sistemático</strong>. El componente aleatorio se refiere a la variabilidad en los datos, mientras que el componente sistemático se refiere a la relación entre las variables independientes y la variable dependiente.</p>
+<p>Hablarémos inicialmente de los modelos de regresión lineal, para luego introducir los modelos lineales generalizados y posteriormente hablar de la regresión Poisson. Vamos hacerlo de manera teórica, haciendo enfasis en los componentes sistemáticos y aleatorios que componen estos modelos, y de manera práctica, utilizando ejemplos con su aplicación en R.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -421,12 +412,41 @@
           overflow: hidden!important;
           display:block!important;
       }</style></aside>
-<p>Un modelo de regresión asume que la respuesta media <span class="math inline">\(\mu_{i}\)</span> para la observación <span class="math inline">\(i\)</span> depende de <span class="math inline">\(p\)</span> variables independientes <span class="math inline">\(x_{1i}\)</span> a <span class="math inline">\(x_{pi}\)</span>, a través de una función <span class="math inline">\(f\)</span> con una serie de parámetros de regresión <span class="math inline">\(\beta_{j}\)</span> (para <span class="math inline">\(j =1,0,...q\)</span>). De tal manera que el <strong>componente sistemático</strong> de una regresión lineal se puede expresar como:</p>
+<ol type="1">
+<li>Modelos de Regresión Lineal</li>
+<li>Modelos Lineales Generalizados</li>
+<li>GLMs Poisson</li>
+<li>Regresión Poisson</li>
+<li>Conclusiones</li>
+<li>Referencias</li>
+</ol>
+</section>
+<section id="modelos-de-regresión-lineal" class="slide level2 smaller">
+<h2>Modelos de Regresión Lineal</h2>
+<blockquote>
+<p><strong>Teoría</strong></p>
+</blockquote>
+<aside class="notes">
+<p>Antes de entrar a hablar de que son los Modelos Lineales Generalizados, es importante mencionar qué es un modelo de Regresión Lineal y de qué está compuesto. En terminos generales, un modelo estadístico consta de un <strong>componente aleatorio</strong> y un <strong>componente sistemático</strong>. El componente aleatorio se refiere a la variabilidad en los datos, mientras que el componente sistemático se refiere a la relación entre las variables independientes y la variable dependiente.</p>
+<p>En los terminos de la notación utilizada por Dunn y Smyth (2018) en su libro <em>“Generalized Linear Models with Examples in R”</em>, el <strong>componente sistemático</strong> en estos modelos, asume que el valor esperado de la variable dependiente depende de p variables independientes a través de una función f con una serie de parámetros de regresión. Donde la media en la i-ésima observación de la combinación lineal de estos párametros es igual a la i-ésima observación de la variable dependiente.</p>
+<p>Por otro lado, el <strong>componente aleatorio</strong> asume que, en la i-ésima observación, la variable dependiente sigue una distribución normal con media y varianza constante.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+<p>Un modelo de regresión lineal asume que la respuesta media <span class="math inline">\(\mu_{i}\)</span> para la observación <span class="math inline">\(i\)</span> depende de <span class="math inline">\(p\)</span> variables independientes <span class="math inline">\(x_{1i}\)</span> a <span class="math inline">\(x_{pi}\)</span>, a través de una función <span class="math inline">\(f\)</span> con una serie de parámetros de regresión <span class="math inline">\(\beta_{j}\)</span> (para <span class="math inline">\(j =1,0,...q\)</span>). De tal manera que el <strong>componente sistemático</strong> de una regresión lineal se puede expresar como:</p>
 <p><span class="math display">\[E[y_{i}] = \mu_{i} = f(\beta_{0} + \beta_{1}x_{1i} + ... + \beta_{p}x_{pi})\]</span></p>
 <p>Mientras que el <strong>componente aleatorio</strong> asume que la variable dependiente <span class="math inline">\(y_{i}\)</span> sigue una distribución normal con media <span class="math inline">\(\mu_{i}\)</span> y varianza constante <span class="math inline">\(\sigma^{2}\)</span>:</p>
 <p><span class="math display">\[y_{i} \sim N(\mu_{i}, \sigma^{2})\]</span></p>
 <aside class="notes">
-<p>El componente aleatorio para la regresión lineal asume que la varianza <span class="math inline">\(\sigma^{2}\)</span> de las respuestas <span class="math inline">\(y_{i}\)</span> es constante cerca de la media <span class="math inline">\(\mu_{i}\)</span>. En otras palabras se asume que las respuestas <span class="math inline">\(y_{i}\)</span> se distribuyen normalmente alrededor de la media <span class="math inline">\(\mu_{i}\)</span> con una varianza constante <span class="math inline">\(\sigma^{2}\)</span></p>
+<p>El componente aleatorio para la regresión lineal asume que la varianza de las respuestas, o la variable dependiente en la i-ésima observación, es constante cerca de la media. En otras palabras se asume que las respuestas se distribuyen normalmente alrededor de la media con una varianza constante.</p>
 <p>Para los modelos lineales, la función <span class="math inline">\(f\)</span> es la función identidad, <span class="math inline">\(f(x) = x\)</span>. Para los modelos no lineales, la función <span class="math inline">\(f\)</span> puede ser cualquier función no lineal.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -442,22 +462,31 @@
 </section>
 <section id="modelos-lineales-generalizados" class="slide level2 smaller">
 <h2>Modelos Lineales Generalizados</h2>
-<p>Un Modelo Lineal Generalizado (GLM, pos sus siglas en inglés) asume que la respuesta media <span class="math inline">\(\mu_{i}\)</span> para la observación <span class="math inline">\(i\)</span> depende de <span class="math inline">\(p\)</span> variables independientes <span class="math inline">\(x_{1i}\)</span> a <span class="math inline">\(x_{pi}\)</span>, a través de una función <span class="math inline">\(g\)</span> con una serie de parámetros de regresión <span class="math inline">\(\beta_{j}\)</span> (para <span class="math inline">\(j =1,0,...q\)</span>). De tal manera que el <strong>componente sistemático</strong> de un GLM se puede expresar como:</p>
-<p><span class="math display">\[g(\mu_{i}) = \beta_{0} + \beta_{1}x_{1i} + ... + \beta_{p}x_{pi}\]</span></p>
+<blockquote>
+<p><strong>Teoría</strong></p>
+</blockquote>
+<aside class="notes">
+<p>Ahora bien, en un Modelo Lineal Generalizado, que es una extensión del modelo lineal, el <strong>componente sistemático</strong> asume que la respuesta media para la observación i-ésima depende de p variables independientes, a través de una función g con una serie de parámetros de regresión. Esta función g es llamada <em>link function</em> y es una función monotónica y diferenciable.</p>
+<p>Miestras que el <strong>componente aleatorio</strong> asume que la variable dependiente sigue una distribución de una familia específica de distribuciones de probabilidad, llamadas Modelos de Dispersión Exponencial, que incluye distribuciones comunes como la normal, la Poisson, que veremos en un momento, y el binomio como casos especiales.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+<p>En un modelo lineal generalizado (GLM, pos sus siglas en inglés), el <strong>componente sistemático</strong> se puede expresar como:</p>
+<p><span class="math display">\[E[y_{i}] = \mu_{i} = g^{(\beta_{0} + \beta_{1}x_{1i} + ... + \beta_{p}x_{pi})}\]</span></p>
 <p>o alternativamente:</p>
-<p><span class="math display">\[\mu_{i} = g^{(\beta_{0} + \beta_{1}x_{1i} + ... + \beta_{p}x_{pi})}\]</span></p>
+<p><span class="math display">\[E[y_{i}] = g(\mu_{i}) = \beta_{0} + \beta_{1}x_{1i} + ... + \beta_{p}x_{pi}\]</span></p>
 <p>Donde <span class="math inline">\(g()\)</span> es llamada <em>link function</em>. Que es una función monotónica y diferenciable (como una función logarítmica).</p>
 <p>El <strong>componente aleatorio</strong> se explica asumiendo que la variable dependiente <span class="math inline">\(y_{i}\)</span> sigue una distribución de una familia específica de distribuciones de probabilidad, llamadas Modelos de Dispersión Exponencial (EDM, por sus siglas en inglés), que incluye distribuciones comunes como la normal, Poisson y el binomio como casos especiales.</p>
 <aside class="notes">
 <ul>
-<li>GLM, por sus siglas en inglés, es una extensión del modelo lineal.</li>
-<li>Es un marco unificado para modelar variables de respuesta que no siguen una distribución normal.</li>
-<li>El modelo lineal generalizado se compone de tres componentes:
-<ul>
-<li>Una función de enlace.</li>
-<li>Una función de distribución.</li>
-<li>Un término de error.</li>
-</ul></li>
 <li>La regresión Poisson es un modelo lineal generalizado que se utiliza para modelar variables de conteo.</li>
 <li>La regresión Poisson es una extensión de la regresión lineal.</li>
 <li>La regresión Poisson se utiliza cuando la variable dependiente es un conteo de eventos.</li>
@@ -477,9 +506,12 @@
 </section>
 <section id="glms-poisson" class="slide level2 smaller">
 <h2>GLMs Poisson</h2>
-<p>El minero ruidoso es una ave nativa australiana pequeña pero peligrosa. Un estudio del hábitat de estas aves registró su abundancia en un transecto <sup>1</sup> de dos hectareas ubicadas en parches de bosque de eucaliptos en Wimmera, al oeste de Victoria, Australia.</p>
+<blockquote>
+<p><strong>Caso de aplicación</strong></p>
+</blockquote>
 <aside class="notes">
-<p>El objetivo del estudio era determinar si la abundancia de mineros ruidosos estaba relacionada con la cantidad de eucaliptos en el bosque.</p>
+<p>Miremos como ejemplo el conjunto de datos <code>nminer</code> del paquete <code>GLMsData</code>, para entender cómo se ajusta un modelo de regresión Poisson y en qué casos se puede utilizar.</p>
+<p>Este conjunto de datos explora la relación entre la abundancia de mineros ruidosos, “un ave nativa australiana pequeña pero peligrosa” y la cantidad de eucaliptos en un bosque. El objetivo del estudio era determinar si la abundancia de mineros ruidosos estaba relacionada con la cantidad de eucaliptos en el bosque.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -491,6 +523,7 @@
           overflow: hidden!important;
           display:block!important;
       }</style></aside>
+<p>El minero ruidoso es una ave nativa australiana pequeña pero peligrosa. Un estudio del hábitat de estas aves registró su abundancia en un transecto de dos hectareas ubicadas en parches de bosque de eucaliptos en Wimmera, al oeste de Victoria, Australia.</p>
 <div class="columns">
 <div class="column" style="width:40%;">
 <div class="cell" data-align="center">
@@ -534,31 +567,22 @@
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-2-1.png" class="quarto-figure quarto-figure-center" width="576"></p>
+<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-2-1.png" width="576"></p>
 </figure>
 </div>
 </div>
 </div>
 </div>
 </div>
-<aside class="notes">
-<p>El número de mineros ruidosos (observados en dos hectáreas son transectos en zonas boscosas dentro de las llanuras de Wimmera del oeste de Victoria, Australia) se compara con el número de eucaliptos. Se añade una pequeña cantidad de aleatoriedad al número de mineros en la dirección vertical para evitar observaciones sobretrazadas</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-<aside><ol class="aside-footnotes"><li id="fn1"><p>Corte transversal de un terreno</p></li></ol></aside></section>
+</section>
 <section id="glms-poisson-1" class="slide level2 smaller">
 <h2>GLMs Poisson</h2>
+<blockquote>
+<p><strong>Caso de aplicación</strong></p>
+</blockquote>
 <aside class="notes">
-<p>El componente aleatorio ciertamente no tiene una varianza constante, ya que las observaciones están más dispersas para un mayor número de eucaliptos. Por lo tanto, un modelo lineal no sería apropiado para estos datos.</p>
+<p>Debido a que la respuestas son variables de conteo, una <strong>distribución Poisson</strong> puede ser adecuada para modelar la relación entre la cantidad de eucaliptos y la abundancia de mineros ruidosos. La distribución de esta familia de distribuciones de probabilidad es una distribución de probabilidad discreta que se utiliza para modelar el número de eventos que ocurren en un intervalo de tiempo o espacio fijo.</p>
+<p>La relación entre la media y el número de eucaliptos tampoco parece ser lineal. Así que un posible modelo para el componente sistemático estaría dado por una funcición exponencial.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -576,13 +600,14 @@
 <p>La relación entre <span class="math inline">\(\mu\)</span> y el número de eucaliptos tampoco parece ser lineal. Así que un posible modelo para el componente sistemático sería:</p>
 <p><span class="math display">\[E[y_{i}] = \mu_{i} = \exp(\beta_{0} + \beta_{1}x_{i})\]</span></p>
 <p>Donde <span class="math inline">\(x_{i}\)</span> es el número de eucaliptos en la ubicación <span class="math inline">\(i\)</span>.</p>
+</section>
+<section id="glms-poisson-2" class="slide level2 smaller">
+<h2>GLMs Poisson</h2>
+<blockquote>
+<p><strong>Teoría</strong></p>
+</blockquote>
 <aside class="notes">
-<ul>
-<li>La regresión Poisson es un modelo lineal generalizado que se utiliza para modelar variables de conteo.</li>
-<li>La regresión Poisson se utiliza para modelar la relación entre una variable dependiente de conteo y una o más variables independientes.</li>
-<li>La regresión Poisson se utiliza cuando la variable dependiente es un conteo de eventos.</li>
-<li>La regresión Poisson se utiliza para modelar la relación entre una variable dependiente de conteo y una o más variables independientes.</li>
-</ul>
+<p>La función de enlace más comunmente utilizada para los modelos lineales generalizados de Poisson es la función logarítmica, la cual garantiza que la media sea mayor a cero lo cual permite la interpretación de efectos multiplicadores en los parámetros de regresión. Esto facilita la interpretación de los coeficientes de regresión, ya que representan la razón de cambio en la media por cada unidad de cambio en el predictor correspondiente.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -594,54 +619,46 @@
           overflow: hidden!important;
           display:block!important;
       }</style></aside>
-</section>
-<section id="glms-poisson-2" class="slide level2 smaller">
-<h2>GLMs Poisson</h2>
-<p>La función de enlace más comunmente utilizada para los GMLs de Poisson es la función logarítmica, la cual garantiza que <span class="math inline">\(\mu&gt;0\)</span> y permite que la interpretación de efectos multiplicadores en la interpretación de los parámetros de regresión. Con esto la forma general de un modelo de regresión Poisson estaría dada por:</p>
+<p>La función de enlace más comunmente utilizada para los GMLs de Poisson es la función logarítmica, la cual garantiza que <span class="math inline">\(\mu&gt;0\)</span>. Con esto la forma general de un modelo de regresión Poisson estaría dada por:</p>
 <p><span class="math display">\[\begin{cases} &amp; y \sim Poisson(\mu) \hspace{1cm} \text{Componente aleatorio}  \\ &amp; log\mu = \beta_{0} + \beta_{1}x_{1} + ... + \beta_{p}x_{p} \hspace{1cm} \text{Componente sistemático} \end{cases}\]</span></p>
-<p>El componente sistemático también se puede expresar como:</p>
+<p>Donde el componente sistemático también se puede expresar como:</p>
 <p><span class="math display">\[\mu = \exp(\beta_{0} + \beta_{1}x_{1} + ... + \beta_{p}x_{p})\]</span></p>
 <p>o</p>
 <p><span class="math display">\[\mu = \exp\beta_{0} \cdot (\exp\beta_{1})^{x_{1}} \cdot ... \cdot (\exp\beta_{p})^{x_{p}}\]</span></p>
-<p>Esto demuestra que el impacto de cada variable independiente es multiplicativo. Al aumentar <span class="math inline">\(x_{j}\)</span> en una unidad, aumenta <span class="math inline">\(\mu\)</span> en el factor <span class="math inline">\(\exp\beta_{j}\)</span>. Si <span class="math inline">\(\beta_{j} = 0\)</span>, entonces no hay efecto de <span class="math inline">\(x_{j}\)</span> en <span class="math inline">\(\mu\)</span>.</p>
 </section>
 <section id="glms-poisson-3" class="slide level2 smaller">
 <h2>GLMs Poisson</h2>
+<blockquote>
+<p><strong>Teoría</strong></p>
+</blockquote>
+<aside class="notes">
+<p>Cuando todas las variables independientes son cualitativas, es apropiado resumir los datos en una tabla de contingencia. En este caso, el modelo se denomina modelo de <strong>log-odds lineal</strong> o <strong>modelo de log-lineal</strong>, no modelo logarítmico lineal. La distinción radica en que el modelo relaciona el logaritmo de la razón de odds con las variables predictoras, no directamente las variables en sí.</p>
+<p>Si alguna variable independiente es cuantitativa, el modelo sigue denominándose <strong>modelo de regresión de Poisson</strong>. La presencia de variables cuantitativas no altera la naturaleza fundamental del modelo.</p>
+<p>Cuando hay una mezcla de variables cualitativas y cuantitativas como variables independientes, se puede utilizar un <strong>modelo lineal generalizado de Poisson (GLM-Poisson)</strong>. Este modelo amplía el modelo de regresión de Poisson básico para acomodar diferentes tipos de variables predictoras.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 <ul>
-<li><p>Cuando las variables independientes son cualitativas (es decir, factores), los datos pueden resumirse como una tabla de contingencia y el modelo suele denominarse <strong>modelo logarítmico lineal</strong> o <strong><em>log-lin model</em></strong>.</p></li>
-<li><p>Cuando alguna de las variables independientes es cuantitativa, el modelo suele llamarse <strong>modelo de regresión Poisson</strong>.</p></li>
+<li><p>Cuando todas las variables independientes son cualitativas, es apropiado resumir los datos en una tabla de contingencia. En este caso, el modelo se denomina modelo de <strong>log-odds lineal</strong> o <strong>modelo de log-lineal</strong>, no modelo logarítmico lineal.</p></li>
+<li><p>Si alguna variable independiente es cuantitativa, el modelo sigue denominándose <strong>modelo de regresión de Poisson</strong>.</p></li>
+<li><p>Cuando hay una mezcla de variables cualitativas y cuantitativas como variables independientes, se puede utilizar un <strong>modelo lineal generalizado de Poisson (GLM-Poisson)</strong>.</p></li>
 </ul>
 </section>
 <section id="regresión-poisson" class="slide level2 smaller">
 <h2>Regresión Poisson</h2>
-<p>Un modelo de regresión Poisson se ajusta a los datos utilizando el método de máxima verosimilitud. La función de verosimilitud para un modelo de regresión Poisson es:</p>
-<p><span class="math display">\[L(\beta) = \prod_{i=1}^{n} \frac{\exp(-\mu_{i}) \mu_{i}^{y_{i}}}{y_{i}!}\]</span></p>
-<p>Donde <span class="math inline">\(\mu_{i} = \exp(\beta_{0} + \beta_{1}x_{1i} + ... + \beta_{p}x_{pi})\)</span> y <span class="math inline">\(y_{i}\)</span> es el valor observado de la variable dependiente para la observación <span class="math inline">\(i\)</span>.</p>
-<p>El objetivo es encontrar los valores de <span class="math inline">\(\beta_{0}, \beta_{1}, ..., \beta_{p}\)</span> que maximizan la función de verosimilitud. Esto se puede hacer utilizando un algoritmo de optimización, como el método de Newton-Raphson.</p>
-</section>
-<section id="regresión-poisson-1" class="slide level2">
-<h2>Regresión Poisson</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href=""></a><span class="fu">library</span>(GLMsData); <span class="fu">data</span>(nminer)</span>
-<span id="cb2-2"><a href=""></a>nm.m1 <span class="ot">&lt;-</span> <span class="fu">glm</span>( Minerab <span class="sc">~</span> Eucs, <span class="at">data=</span>nminer, <span class="at">family=</span>poisson)</span>
-<span id="cb2-3"><a href=""></a><span class="fu">printCoefmat</span>(<span class="fu">coef</span>(<span class="fu">summary</span>(nm.m1)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>             Estimate Std. Error z value  Pr(&gt;|z|)    
-(Intercept) -0.876211   0.282793 -3.0984  0.001946 ** 
-Eucs         0.113981   0.012431  9.1691 &lt; 2.2e-16 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-</div>
-</div>
-</section>
-<section id="regresión-poisson-2" class="slide level2">
-<h2>Regresión Poisson</h2>
-
-<img data-src="slides_files/figure-revealjs/unnamed-chunk-4-1.png" class="quarto-figure quarto-figure-center r-stretch" width="960"></section>
-<section id="ejemplo" class="slide level2 smaller">
-<h2>Ejemplo</h2>
+<blockquote>
+<p><strong>Caso de aplicación</strong></p>
+</blockquote>
 <aside class="notes">
-<p>El conjunto de datos <code>lungcap</code>, del paquete <code>GLMsData</code>, explora la relación entre la capacidad pulmonar (medida a través del Volumen Respiratorio Forzado, FEV por sus siglas en inglés, en litros), la edad, altura y genero de 654 estudiantes del Este de Boston que fumaron y no durante mediados y finales de la década de 1970.</p>
+<p>La aplicación en R de la regresión Poisson se puede realizar a través de la función <code>glm()</code> del paquete <code>stats</code>. A continuación se muestra un ejemplo de cómo ajustar un modelo de regresión Poisson a los datos de <code>nminer</code>.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -653,73 +670,305 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
           overflow: hidden!important;
           display:block!important;
       }</style></aside>
+<div class="columns">
+<div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href=""></a><span class="fu">library</span>(GLMsData)</span>
-<span id="cb4-2"><a href=""></a><span class="fu">data</span>(lungcap)</span>
-<span id="cb4-3"><a href=""></a><span class="fu">head</span>(lungcap)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">library</span>(GLMsData)</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="fu">data</span>(nminer)</span>
+<span id="cb2-3"><a href="#cb2-3"></a></span>
+<span id="cb2-4"><a href="#cb2-4"></a>nm.m1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(Minerab <span class="sc">~</span> Eucs, <span class="at">data=</span>nminer,</span>
+<span id="cb2-5"><a href="#cb2-5"></a>             <span class="at">family=</span>poisson)</span>
+<span id="cb2-6"><a href="#cb2-6"></a></span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="fu">summary</span>(nm.m1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>  Age   FEV Ht Gender Smoke
-1   3 1.072 46      F     0
-2   4 0.839 48      F     0
-3   4 1.102 48      F     0
-4   4 1.389 48      F     0
-5   4 1.577 49      F     0
-6   4 1.418 49      F     0</code></pre>
+<pre><code>
+Call:
+glm(formula = Minerab ~ Eucs, family = poisson, data = nminer)
+
+Coefficients:
+            Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept) -0.87621    0.28279  -3.098  0.00195 ** 
+Eucs         0.11398    0.01243   9.169  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 150.545  on 30  degrees of freedom
+Residual deviance:  63.318  on 29  degrees of freedom
+AIC: 121.47
+
+Number of Fisher Scoring iterations: 5</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a><span class="fu">str</span>(lungcap)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>'data.frame':   654 obs. of  5 variables:
- $ Age   : int  3 4 4 4 4 4 4 5 5 5 ...
- $ FEV   : num  1.072 0.839 1.102 1.389 1.577 ...
- $ Ht    : num  46 48 48 48 49 49 50 46.5 49 49 ...
- $ Gender: Factor w/ 2 levels "F","M": 1 1 1 1 1 1 1 1 1 1 ...
- $ Smoke : int  0 0 0 0 0 0 0 0 0 0 ...</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href=""></a><span class="fu">summary</span>(lungcap)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>      Age              FEV              Ht        Gender      Smoke        
- Min.   : 3.000   Min.   :0.791   Min.   :46.00   F:318   Min.   :0.00000  
- 1st Qu.: 8.000   1st Qu.:1.981   1st Qu.:57.00   M:336   1st Qu.:0.00000  
- Median :10.000   Median :2.547   Median :61.50           Median :0.00000  
- Mean   : 9.931   Mean   :2.637   Mean   :61.14           Mean   :0.09939  
- 3rd Qu.:12.000   3rd Qu.:3.119   3rd Qu.:65.50           3rd Qu.:0.00000  
- Max.   :19.000   Max.   :5.793   Max.   :74.00           Max.   :1.00000  </code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href=""></a>lungcap<span class="sc">$</span>Smoke <span class="ot">&lt;-</span> <span class="fu">factor</span>(lungcap<span class="sc">$</span>Smoke, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Non-smoker"</span>, <span class="st">"Smoker"</span>))</span>
-<span id="cb10-2"><a href=""></a><span class="fu">summary</span>(lungcap<span class="sc">$</span>Smoke)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Non-smoker     Smoker 
-       589         65 </code></pre>
+</div><div class="column" style="width:50%;">
+<p><strong>Ajuste del modelo</strong></p>
+<ul>
+<li><code>glm()</code>: Ajusta un modelo lineal generalizado.</li>
+<li><code>Minerab ~ Eucs</code>: Fórmula de la regresión.</li>
+<li><code>data=nminer</code>: Conjunto de datos.</li>
+<li><code>family=poisson</code>: Especifica la distribución de la familia de la regresión Poisson.</li>
+</ul>
 </div>
 </div>
 </section>
-<section class="slide level2">
+<section id="regresión-poisson-1" class="slide level2 smaller">
+<h2>Regresión Poisson</h2>
+<blockquote>
+<p><strong>Caso de aplicación</strong></p>
+</blockquote>
+<aside class="notes">
+<ul>
+<li><p><strong>Intercepto:</strong> Representa la media esperada del conteo de mineros ruidosos cuando la variable independiente (<code>Eucs</code>) es igual a cero. En este caso, el intercepto es de aproximadamente -0.87, lo cual no tiene una interpretación directa en el conteo de mineros ruidosos.</p></li>
+<li><p><strong>Pendiente:</strong> Representa el cambio en la media del conteo de mineros ruidosos por cada unidad de cambio en la variable independiente (<code>Eucs</code>). En este caso, la pendiente es de aproximadamente 0.11, lo cual indica que por cada unidad adicional de eucaliptos, se espera un incremento del 11% en el conteo de mineros ruidosos.</p></li>
+</ul>
+<p>A través del test de wald, se puede determinar que ambos coeficientes son significativos, con un nivel de confianza del 95%.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">library</span>(GLMsData)</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="fu">data</span>(nminer)</span>
+<span id="cb4-3"><a href="#cb4-3"></a></span>
+<span id="cb4-4"><a href="#cb4-4"></a>nm.m1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(Minerab <span class="sc">~</span> Eucs, <span class="at">data=</span>nminer,</span>
+<span id="cb4-5"><a href="#cb4-5"></a>             <span class="at">family=</span>poisson)</span>
+<span id="cb4-6"><a href="#cb4-6"></a></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="fu">summary</span>(nm.m1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = Minerab ~ Eucs, family = poisson, data = nminer)
 
+Coefficients:
+            Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept) -0.87621    0.28279  -3.098  0.00195 ** 
+Eucs         0.11398    0.01243   9.169  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-<img data-src="slides_files/figure-revealjs/unnamed-chunk-6-1.png" class="quarto-figure quarto-figure-center r-stretch" width="960"></section>
-<section class="slide level2">
+(Dispersion parameter for poisson family taken to be 1)
 
+    Null deviance: 150.545  on 30  degrees of freedom
+Residual deviance:  63.318  on 29  degrees of freedom
+AIC: 121.47
 
-<img data-src="slides_files/figure-revealjs/unnamed-chunk-7-1.png" class="quarto-figure quarto-figure-center r-stretch" width="960"></section>
-<section class="slide level2">
+Number of Fisher Scoring iterations: 5</code></pre>
+</div>
+</div>
+</div><div class="column" style="width:50%;">
+<p><strong>Coeficientes</strong></p>
+<ul>
+<li><strong>Intercepto:</strong> Representa la media esperada del conteo de mineros ruidosos (<code>Minerab</code>) cuando la variable independiente (<code>Eucs</code>) es igual a cero.</li>
+<li><strong>Pendiente:</strong> Representa el cambio en la media del conteo de mineros ruidosos (<code>Minerab</code>) por cada unidad de cambio en la variable independiente (<code>Eucs</code>).</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="regresión-poisson-2" class="slide level2 smaller">
+<h2>Regresión Poisson</h2>
+<blockquote>
+<p><strong>Caso de aplicación</strong></p>
+</blockquote>
+<aside class="notes">
+<p>Se utiliza para evaluar la bondad de ajuste del modelo. A menudo, se compara el modelo ajustado con un modelo nulo, que es un modelo sin variables independientes. En este caso, el valor de la prueba de bondad de es significativo, lo cual indica que el modelo ajustado es significativamente diferente del modelo nulo.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">library</span>(GLMsData)</span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="fu">data</span>(nminer)</span>
+<span id="cb6-3"><a href="#cb6-3"></a></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="fu">anova</span>(nm.m1, <span class="at">test=</span><span class="st">"Chisq"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Deviance Table
 
-<div class="cell" data-layout-align="center">
+Model: poisson, link: log
+
+Response: Minerab
+
+Terms added sequentially (first to last)
+
+     Df Deviance Resid. Df Resid. Dev  Pr(&gt;Chi)    
+NULL                    30    150.545              
+Eucs  1   87.227        29     63.318 &lt; 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</div><div class="column" style="width:50%;">
+<p><strong>Bondad de ajuste</strong></p>
+<p>El argumento <code>test="Chisq"</code> en la función <code>anova()</code> se utiliza para realizar una prueba de bondad de ajuste del modelo. En este caso, el valor de la prueba de bondad es significativo.</p>
+</div>
+</div>
+</section>
+<section id="regresión-poisson-3" class="slide level2">
+<h2>Regresión Poisson</h2>
+<aside class="notes">
+<p>A continuación un diagnóstico gráfico del modelo de regresión Poisson ajustado a los datos de <code>nminer</code>, en cuanto a la correcta elección de la familia de distribución y la relevancia de las observaciones en el modelo.</p>
+<p>La gráfica Q-Q se suele utilizar para determinar si la elección de la distribución de Poisson es apropiada para los datos. En este caso, la gráfica Q-Q muestra que los residuos de los cuantiles siguen una distribución aproximadamente normal, lo cual indica que la elección de la distribución de Poisson es apropiada para los datos.</p>
+<p>De otro lado, la gráfica de residuos frente a los valores ajustados muestra que los residuos no tienen una relación clara con los valores ajustados, lo cual confirma, lo ya dicho acerca de la pertinencia del modelo.</p>
+<p>La gráfica de la distancia de Cook se utiliza para identificar observaciones influyentes en el modelo. En este caso, la gráfica de la distancia de Cook muestra que la observación 17 tiene una influencia significativa en el modelo. Por lo tanto, esta observación puede tener un impacto significativo en los resultados del mismo.</p>
+<p>La gráfica de “hat values” (o valores sombrero) se utiliza para identificar la influencia que tiene cada observación en la predicción de su propio valor ajustado. En este caso, la observación 11 tiene un valor sombrero significativamente mayor que las demás observaciones, lo cual indica que esta observación tiene una influencia significativa en la predicción de su propio valor ajustado.</p>
+<p>En resumen la observación 11 (Cuadrado relleno) tiene un valor sombrero significativamente mayor que las demás observaciones, pero su residuo es pequeño y, por lo tanto, no es influyente. La observación 7 (Circulo relleno) tiene un residuo grande, pero su valor sombrero es pequeño y, por lo tanto, no es influyente. La observación 17 (Triangulo relleno) tiene un valor sombrero y un residuo razonablemente grande, por lo tanto es influyente.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+
+<img data-src="slides_files/figure-revealjs/unnamed-chunk-6-1.png" width="768" class="r-stretch quarto-figure-center"></section>
+<section id="regresión-poisson-4" class="slide level2 smaller">
+<h2>Regresión Poisson</h2>
+<aside class="notes">
+<p>maxhat &lt;- Observación con mayor influecia en la predicción de su propio valor ajustado maxqr &lt;-Observación con mayor residuo cuantílico maxinfl &lt;- Observación con mayor influencia a través de la distancia de Cook</p>
+<p>Estos resultados sugieren que los dos transectos con mayor número de eucaliptos son importantes para la comprensión de los datos. Aún cuando el deviance del modelo omitiendo la observación 17 es menor que el deviance del modelo original, la observación 17 tiene una influencia significativa en el modelo. Esto se observa a través de la línea de valores predichos en la gráfica de dispersión de los datos, donde la observación 17 se encuentra en el extremo superior de la línea de valores predichos.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+<blockquote>
+<p><strong>Caso de aplicación</strong></p>
+</blockquote>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="cell">
 <div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-8-1.png" class="quarto-figure quarto-figure-center" width="960"></p>
-</figure>
+<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-7-1.png" width="614"></p>
+</div>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a> nm.m2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(Minerab <span class="sc">~</span> Eucs,</span>
+<span id="cb8-2"><a href="#cb8-2"></a>              <span class="at">family=</span>poisson, <span class="at">data=</span>nminer,</span>
+<span id="cb8-3"><a href="#cb8-3"></a>              <span class="at">subset=</span>(<span class="sc">-</span>maxinfl))</span>
+<span id="cb8-4"><a href="#cb8-4"></a></span>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="fu">summary</span>(nm.m2)<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              Estimate Std. Error   z value     Pr(&gt;|z|)
+(Intercept) -1.0112791 0.29172863 -3.466506 5.272699e-04
+Eucs         0.1247156 0.01331536  9.366299 7.512065e-21</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">summary</span>(nm.m1)<span class="sc">$</span>coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              Estimate Std. Error   z value     Pr(&gt;|z|)
+(Intercept) -0.8762114 0.28279293 -3.098421 1.945551e-03
+Eucs         0.1139813 0.01243104  9.169092 4.770189e-20</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="fu">deviance</span>(nm.m1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 63.31798</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">deviance</span>(nm.m2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 59.14028</code></pre>
 </div>
 </div>
 </div>
-<div class="quarto-auto-generated-content">
-<p><img src="images/macc.png" class="slide-logo"></p>
-<div class="footer footer-default">
+</div>
+</section>
+<section id="conclusiones" class="slide level2 smaller">
+<h2>Conclusiones</h2>
+<aside class="notes">
+<ol type="1">
+<li>Los modelos de regresión Poisson son una herramienta útil para modelar variables de conteo.</li>
+</ol>
+<ul>
+<li>En este caso, se utilizó un modelo de regresión Poisson para modelar la relación entre la abundancia de mineros ruidosos y la cantidad de eucaliptos en un bosque.</li>
+<li>El modelo ajustado mostró una buena bondad de ajuste y los coeficientes de regresión fueron significativos.</li>
+<li>Esto indica que existe una relación positiva entre la abundancia de mineros ruidosos y la cantidad de eucaliptos.</li>
+</ul>
+<ol start="2" type="1">
+<li>Es importante realizar un diagnóstico gráfico del modelo para evaluar la bondad de ajuste y la presencia de observaciones influyentes.</li>
+</ol>
+<ul>
+<li>En este caso, el diagnóstico gráfico mostró que la elección de la distribución de Poisson era apropiada y que no había observaciones con una influencia significativa en el modelo.</li>
+<li>Sin embargo, se identificó una observación que tenía un valor sombrero y un residuo razonablemente grande, por lo que se reajustó el modelo excluyendo esta observación.</li>
+</ul>
+<ol start="3" type="1">
+<li>La interpretación de los coeficientes de regresión en los modelos de regresión Poisson debe hacerse con precaución.</li>
+</ol>
+<ul>
+<li>El intercepto no tiene una interpretación directa en el conteo de mineros ruidosos.</li>
+<li>La pendiente representa el cambio en la media del conteo de mineros ruidosos por cada unidad de cambio en la variable independiente (Eucs).</li>
+<li>En este caso, la pendiente fue de 0.11, lo que indica que por cada unidad adicional de eucaliptos, se espera un incremento del 11% en el conteo de mineros ruidosos.</li>
+</ul>
+<ol start="4" type="1">
+<li>Los modelos de regresión Poisson se pueden utilizar para hacer predicciones sobre el valor de la variable de respuesta para nuevos valores de la variable independiente.</li>
+</ol>
+<ul>
+<li>En este caso, se utilizaron los modelos ajustados para predecir la abundancia de mineros ruidosos en nuevos transectos con diferentes cantidades de eucaliptos.</li>
+</ul>
+<ol start="5" type="1">
+<li>Es importante tener en cuenta las limitaciones de los modelos de regresión Poisson al interpretarlos y utilizarlos para hacer predicciones.</li>
+</ol>
+<ul>
+<li>Los modelos de regresión Poisson asumen que la variable de respuesta sigue una distribución de Poisson.</li>
+<li>Esta suposición puede no ser válida en todos los casos.</li>
+<li>Es importante verificar la validez de esta suposición antes de ajustar un modelo de regresión Poisson.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+<p><br></p>
+<ul>
+<li><p>Los modelos de regresión Poisson son una extensión de los modelos lineales generalizados que se utilizan para modelar variables de conteo.</p></li>
+<li><p>La interpretación de los coeficientes de regresión en los modelos de regresión Poisson debe hacerse con precaución.</p></li>
+<li><p>Es importante realizar un diagnóstico gráfico del modelo para evaluar la bondad de ajuste y la presencia de observaciones influyentes.</p></li>
+<li><p>Los modelos de regresión Poisson se pueden utilizar para hacer predicciones sobre el valor de la variable de respuesta para nuevos valores de la variable independiente.</p></li>
+</ul>
+</section>
+<section id="referencias" class="slide level2 smaller">
+<h2>Referencias</h2>
+<p><br></p>
+<ul>
+<li>Dunn, P. K., &amp; Smyth, G. K. (2018). Generalized linear models with examples in R. Springer.</li>
+</ul>
+
+<img src="images/macc.png" class="slide-logo r-stretch"><div class="footer footer-default">
 <p>Análisis Avanzado de Datos</p>
 </div>
-</div>
 </section></section>
-
     </div>
   </div>
 
@@ -746,6 +995,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
       Reveal.initialize({
 'controlsAuto': true,
 'previewLinksAuto': false,
+'smaller': false,
 'pdfSeparateFragments': false,
 'autoAnimateEasing': "ease",
 'autoAnimateDuration': 1,
@@ -931,80 +1181,42 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
       });
     </script>
     
-
     <script>
-
       // htmlwidgets need to know to resize themselves when slides are shown/hidden.
-
       // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
-
       // slide changes (different for each slide format).
-
       (function () {
-
         // dispatch for htmlwidgets
-
         function fireSlideEnter() {
-
           const event = window.document.createEvent("Event");
-
           event.initEvent("slideenter", true, true);
-
           window.document.dispatchEvent(event);
-
         }
-
-    
 
         function fireSlideChanged(previousSlide, currentSlide) {
-
           fireSlideEnter();
 
-    
-
           // dispatch for shiny
-
           if (window.jQuery) {
-
             if (previousSlide) {
-
               window.jQuery(previousSlide).trigger("hidden");
-
             }
-
             if (currentSlide) {
-
               window.jQuery(currentSlide).trigger("shown");
-
             }
-
           }
-
         }
-
-    
 
         // hookup for slidy
-
         if (window.w3c_slidy) {
-
           window.w3c_slidy.add_observer(function (slide_num) {
-
             // slide_num starts at position 1
-
             fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
-
           });
-
         }
 
-    
-
       })();
-
     </script>
-
-    
 
     <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1082,27 +1294,10 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
         // clear code selection
         e.clearSelection();
       });
-        var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-        var mailtoRegex = new RegExp(/^mailto:/);
-          var filterRegex = new RegExp('/' + window.location.host + '/');
-        var isInternal = (href) => {
-            return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-        }
-        // Inspect non-navigation links and adorn them if external
-     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
-        for (var i=0; i<links.length; i++) {
-          const link = links[i];
-          if (!isInternal(link.href)) {
-            // undo the damage that might have been done by quarto-nav.js in the case of
-            // links that we want to consider external
-            if (link.dataset.originalHref !== undefined) {
-              link.href = link.dataset.originalHref;
-            }
-          }
-        }
-      function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      function tippyHover(el, contentFn) {
         const config = {
           allowHTML: true,
+          content: contentFn,
           maxWidth: 500,
           delay: 100,
           arrow: false,
@@ -1112,17 +1307,8 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
           interactive: true,
           interactiveBorder: 10,
           theme: 'light-border',
-          placement: 'bottom-start',
+          placement: 'bottom-start'
         };
-        if (contentFn) {
-          config.content = contentFn;
-        }
-        if (onTriggerFn) {
-          config.onTrigger = onTriggerFn;
-        }
-        if (onUntriggerFn) {
-          config.onUntrigger = onUntriggerFn;
-        }
           config['offset'] = [0,0];
           config['maxWidth'] = 700;
         window.tippy(el, config); 
@@ -1136,11 +1322,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
           try { href = new URL(href).hash; } catch {}
           const id = href.replace(/^#\/?/, "");
           const note = window.document.getElementById(id);
-          if (note) {
-            return note.innerHTML;
-          } else {
-            return "";
-          }
+          return note.innerHTML;
         });
       }
       const findCites = (el) => {

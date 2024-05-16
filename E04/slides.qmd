@@ -11,19 +11,30 @@ editor: visual
 
 # Contenido {.smaller}
 
-<!-- 1.  Modelo Lineal Generalizado
-2.  Regresión Poisson
-3.  Ejemplo
-4.  Conclusiones
-5.  Referencias -->
+::: {.notes}
+Hablarémos inicialmente de los modelos de regresión lineal, para luego introducir los modelos lineales generalizados y posteriormente hablar de la regresión Poisson. Vamos hacerlo de manera teórica, haciendo enfasis en los componentes sistemáticos y aleatorios que componen estos modelos, y de manera práctica, utilizando ejemplos con su aplicación en R.
+:::
+
+1. Modelos de Regresión Lineal
+2. Modelos Lineales Generalizados
+3. GLMs Poisson
+4. Regresión Poisson
+6. Conclusiones
+7. Referencias
 
 ## Modelos de Regresión Lineal {.smaller}
 
+>**Teoría**
+
 ::: {.notes}
-Un modelo estadístico consta de un **componente aleatorio** y un **componente sistemático**. El componente aleatorio se refiere a la variabilidad en los datos, mientras que el componente sistemático se refiere a la relación entre las variables independientes y la variable dependiente.
+Antes de entrar a hablar de que son los Modelos Lineales Generalizados, es importante mencionar qué es un modelo de Regresión Lineal y de qué está compuesto. En terminos generales, un modelo estadístico consta de un **componente aleatorio** y un **componente sistemático**. El componente aleatorio se refiere a la variabilidad en los datos, mientras que el componente sistemático se refiere a la relación entre las variables independientes y la variable dependiente.
+
+En los terminos de la notación utilizada por Dunn y Smyth (2018) en su libro *"Generalized Linear Models with Examples in R"*, el **componente sistemático** en estos modelos, asume que el valor esperado de la variable dependiente depende de p variables independientes a través de una función f con una serie de parámetros de regresión. Donde la media en la i-ésima observación de la combinación lineal de estos párametros es igual a la i-ésima observación de la variable dependiente.
+
+Por otro lado, el **componente aleatorio** asume que, en la i-ésima observación, la variable dependiente sigue una distribución normal con media y varianza constante.
 :::
 
-Un modelo de regresión asume que la respuesta media $\mu_{i}$ para la observación $i$ depende de $p$ variables independientes $x_{1i}$ a $x_{pi}$, a través de una función $f$ con una serie de parámetros de regresión $\beta_{j}$ (para $j =1,0,...q$). De tal manera que el **componente sistemático** de una regresión lineal se puede expresar como:
+Un modelo de regresión lineal asume que la respuesta media $\mu_{i}$ para la observación $i$ depende de $p$ variables independientes $x_{1i}$ a $x_{pi}$, a través de una función $f$ con una serie de parámetros de regresión $\beta_{j}$ (para $j =1,0,...q$). De tal manera que el **componente sistemático** de una regresión lineal se puede expresar como:
 
 $$E[y_{i}] = \mu_{i} = f(\beta_{0} + \beta_{1}x_{1i} + ... + \beta_{p}x_{pi})$$
 
@@ -32,33 +43,34 @@ Mientras que el **componente aleatorio** asume que la variable dependiente $y_{i
 $$y_{i} \sim N(\mu_{i}, \sigma^{2})$$
 
 ::: {.notes}
-El componente aleatorio para la regresión lineal asume que la varianza $\sigma^{2}$ de las respuestas $y_{i}$ es constante cerca de la media $\mu_{i}$. En otras palabras se asume que las respuestas $y_{i}$ se distribuyen normalmente alrededor de la media $\mu_{i}$ con una varianza constante $\sigma^{2}$
+El componente aleatorio para la regresión lineal asume que la varianza de las respuestas, o la variable dependiente en la i-ésima observación, es constante cerca de la media. En otras palabras se asume que las respuestas se distribuyen normalmente alrededor de la media con una varianza constante.
 
 Para los modelos lineales, la función $f$ es la función identidad, $f(x) = x$. Para los modelos no lineales, la función $f$ puede ser cualquier función no lineal.
 :::
 
 ## Modelos Lineales Generalizados {.smaller}
 
-Un Modelo Lineal Generalizado (GLM, pos sus siglas en inglés) asume que la respuesta media $\mu_{i}$ para la observación $i$ depende de $p$ variables independientes $x_{1i}$ a $x_{pi}$, a través de una función $g$ con una serie de parámetros de regresión $\beta_{j}$ (para $j =1,0,...q$). De tal manera que el **componente sistemático** de un GLM se puede expresar como:
+>**Teoría**
 
-$$g(\mu_{i}) = \beta_{0} + \beta_{1}x_{1i} + ... + \beta_{p}x_{pi}$$
+::: {.notes}
+Ahora bien, en un Modelo Lineal Generalizado, que es una extensión del modelo lineal, el **componente sistemático** asume que la respuesta media para la observación i-ésima depende de p variables independientes, a través de una función g con una serie de parámetros de regresión. Esta función g es llamada *link function* y es una función monotónica y diferenciable.
+
+Miestras que el **componente aleatorio** asume que la variable dependiente sigue una distribución de una familia específica de distribuciones de probabilidad, llamadas Modelos de Dispersión Exponencial, que incluye distribuciones comunes como la normal, la Poisson, que veremos en un momento, y el binomio como casos especiales.
+:::
+
+En un modelo lineal generalizado (GLM, pos sus siglas en inglés), el **componente sistemático** se puede expresar como:
+
+$$E[y_{i}] = \mu_{i} = g^{(\beta_{0} + \beta_{1}x_{1i} + ... + \beta_{p}x_{pi})}$$
 
 o alternativamente:
 
-$$\mu_{i} = g^{(\beta_{0} + \beta_{1}x_{1i} + ... + \beta_{p}x_{pi})}$$
+$$E[y_{i}] = g(\mu_{i}) = \beta_{0} + \beta_{1}x_{1i} + ... + \beta_{p}x_{pi}$$
 
 Donde $g()$ es llamada *link function*. Que es una función monotónica y diferenciable (como una función logarítmica).
 
 El **componente aleatorio** se explica asumiendo que la variable dependiente $y_{i}$ sigue una distribución de una familia específica de distribuciones de probabilidad, llamadas Modelos de Dispersión Exponencial (EDM, por sus siglas en inglés), que incluye distribuciones comunes como la normal, Poisson y el binomio como casos especiales.
 
 ::: {.notes}
--   GLM, por sus siglas en inglés, es una extensión del modelo lineal.
--   Es un marco unificado para modelar variables de respuesta que no siguen una distribución normal.
--   El modelo lineal generalizado se compone de tres componentes:
-    -   Una función de enlace.
-    -   Una función de distribución.
-    -   Un término de error.
-
 -   La regresión Poisson es un modelo lineal generalizado que se utiliza para modelar variables de conteo.
 -   La regresión Poisson es una extensión de la regresión lineal.
 -   La regresión Poisson se utiliza cuando la variable dependiente es un conteo de eventos.
@@ -67,11 +79,16 @@ El **componente aleatorio** se explica asumiendo que la variable dependiente $y_
 
 ## GLMs Poisson {.smaller}
 
-El minero ruidoso es una ave nativa australiana pequeña pero peligrosa. Un estudio del hábitat de estas aves registró su abundancia en un transecto ^[Corte transversal de un terreno] de dos hectareas ubicadas en parches de bosque de eucaliptos en Wimmera, al oeste de Victoria, Australia.
+>**Caso de aplicación**
 
 ::: {.notes}
-El objetivo del estudio era determinar si la abundancia de mineros ruidosos estaba relacionada con la cantidad de eucaliptos en el bosque.
+Miremos como ejemplo el conjunto de datos `nminer` del paquete `GLMsData`, para entender cómo se ajusta un modelo de regresión Poisson y en qué casos se puede utilizar.
+
+Este conjunto de datos explora la relación entre la abundancia de mineros ruidosos, "un ave nativa australiana pequeña pero peligrosa" y la cantidad de eucaliptos en un bosque. El objetivo del estudio era determinar si la abundancia de mineros ruidosos estaba relacionada con la cantidad de eucaliptos en el bosque.
 :::
+
+El minero ruidoso es una ave nativa australiana pequeña pero peligrosa. Un estudio del hábitat de estas aves registró su abundancia en un transecto de dos hectareas ubicadas en parches de bosque de eucaliptos en Wimmera, al oeste de Victoria, Australia.
+
 
 :::: {.columns}
 
@@ -101,14 +118,14 @@ plot( jitter(Minerab) ~ Eucs, data=nminer, las=1, ylim=c(0, 20),
 :::
 ::::
 
-::: {.notes}
-El número de mineros ruidosos (observados en dos hectáreas son transectos en zonas boscosas dentro de las llanuras de Wimmera del oeste de Victoria, Australia) se compara con el número de eucaliptos. Se añade una pequeña cantidad de aleatoriedad al número de mineros en la dirección vertical para evitar observaciones sobretrazadas
-:::
-
 ## GLMs Poisson {.smaller}
 
+>**Caso de aplicación**
+
 ::: {.notes}
-El componente aleatorio ciertamente no tiene una varianza constante, ya que las observaciones están más dispersas para un mayor número de eucaliptos. Por lo tanto, un modelo lineal no sería apropiado para estos datos.
+Debido a que la respuestas son variables de conteo, una **distribución Poisson** puede ser adecuada para modelar la relación entre la cantidad de eucaliptos y la abundancia de mineros ruidosos. La distribución de esta familia de distribuciones de probabilidad es una distribución de probabilidad discreta que se utiliza para modelar el número de eventos que ocurren en un intervalo de tiempo o espacio fijo.
+
+La relación entre la media y el número de eucaliptos tampoco parece ser lineal. Así que un posible modelo para el componente sistemático estaría dado por una funcición exponencial.
 :::
 
 Debido a que la respuestas son variables de conteo, una **distribución Poisson** con media $\mu_{i}$ para la observación $i$ puede ser adecuada para modelar la relación entre la cantidad de eucaliptos y la abundancia de mineros ruidosos. Cuyo componente aleatorio estaría dado por:
@@ -123,20 +140,19 @@ $$E[y_{i}] = \mu_{i} = \exp(\beta_{0} + \beta_{1}x_{i})$$
 
 Donde $x_{i}$ es el número de eucaliptos en la ubicación $i$.
 
-::: {.notes}
--   La regresión Poisson es un modelo lineal generalizado que se utiliza para modelar variables de conteo.
--   La regresión Poisson se utiliza para modelar la relación entre una variable dependiente de conteo y una o más variables independientes.
--   La regresión Poisson se utiliza cuando la variable dependiente es un conteo de eventos.
--   La regresión Poisson se utiliza para modelar la relación entre una variable dependiente de conteo y una o más variables independientes.
-:::
-
 ## GLMs Poisson {.smaller}
 
-La función de enlace más comunmente utilizada para los GMLs de Poisson es la función logarítmica, la cual garantiza que $\mu>0$ y permite que la interpretación de efectos multiplicadores en la interpretación de los parámetros de regresión. Con esto la forma general de un modelo de regresión Poisson estaría dada por:
+>**Teoría**
+
+::: {.notes}
+La función de enlace más comunmente utilizada para los modelos lineales generalizados de Poisson es la función logarítmica, la cual garantiza que la media sea mayor a cero lo cual permite la interpretación de efectos multiplicadores en los parámetros de regresión. Esto facilita la interpretación de los coeficientes de regresión, ya que representan la razón de cambio en la media por cada unidad de cambio en el predictor correspondiente.
+:::
+
+La función de enlace más comunmente utilizada para los GMLs de Poisson es la función logarítmica, la cual garantiza que $\mu>0$. Con esto la forma general de un modelo de regresión Poisson estaría dada por:
 
 $$\begin{cases} & y \sim Poisson(\mu) \hspace{1cm} \text{Componente aleatorio}  \\ & log\mu = \beta_{0} + \beta_{1}x_{1} + ... + \beta_{p}x_{p} \hspace{1cm} \text{Componente sistemático} \end{cases}$$
 
-El componente sistemático también se puede expresar como:
+Donde el componente sistemático también se puede expresar como:
 
 $$\mu = \exp(\beta_{0} + \beta_{1}x_{1} + ... + \beta_{p}x_{p})$$
 
@@ -144,37 +160,138 @@ o
 
 $$\mu = \exp\beta_{0} \cdot (\exp\beta_{1})^{x_{1}} \cdot ... \cdot (\exp\beta_{p})^{x_{p}}$$
 
-Esto demuestra que el impacto de cada variable independiente es multiplicativo. Al aumentar $x_{j}$ en una unidad, aumenta $\mu$ en el factor $\exp\beta_{j}$. Si $\beta_{j} = 0$, entonces no hay efecto de $x_{j}$ en $\mu$.
-
 ## GLMs Poisson {.smaller}
 
-- Cuando las variables independientes son cualitativas (es decir, factores), los datos pueden resumirse como una tabla de contingencia y el modelo suele denominarse **modelo logarítmico lineal** o ***log-lin model***.
+>**Teoría**
 
-- Cuando alguna de las variables independientes es cuantitativa, el modelo suele llamarse **modelo de regresión Poisson**.
+::: {.notes}
+Cuando todas las variables independientes son cualitativas, es apropiado resumir los datos en una tabla de contingencia. En este caso, el modelo se denomina modelo de **log-odds lineal** o **modelo de log-lineal**, no modelo logarítmico lineal. La distinción radica en que el modelo relaciona el logaritmo de la razón de odds con las variables predictoras, no directamente las variables en sí.
+
+Si alguna variable independiente es cuantitativa, el modelo sigue denominándose **modelo de regresión de Poisson**. La presencia de variables cuantitativas no altera la naturaleza fundamental del modelo.
+
+Cuando hay una mezcla de variables cualitativas y cuantitativas como variables independientes, se puede utilizar un **modelo lineal generalizado de Poisson (GLM-Poisson)**. Este modelo amplía el modelo de regresión de Poisson básico para acomodar diferentes tipos de variables predictoras.
+:::
+
+- Cuando todas las variables independientes son cualitativas, es apropiado resumir los datos en una tabla de contingencia. En este caso, el modelo se denomina modelo de **log-odds lineal** o **modelo de log-lineal**, no modelo logarítmico lineal.
+
+- Si alguna variable independiente es cuantitativa, el modelo sigue denominándose **modelo de regresión de Poisson**.
+
+- Cuando hay una mezcla de variables cualitativas y cuantitativas como variables independientes, se puede utilizar un **modelo lineal generalizado de Poisson (GLM-Poisson)**.
 
 ## Regresión Poisson {.smaller}
 
-Un modelo de regresión Poisson se ajusta a los datos utilizando el método de máxima verosimilitud. La función de verosimilitud para un modelo de regresión Poisson es:
+>**Caso de aplicación**
 
-$$L(\beta) = \prod_{i=1}^{n} \frac{\exp(-\mu_{i}) \mu_{i}^{y_{i}}}{y_{i}!}$$
+::: {.notes}
+La aplicación en R de la regresión Poisson se puede realizar a través de la función `glm()` del paquete `stats`. A continuación se muestra un ejemplo de cómo ajustar un modelo de regresión Poisson a los datos de `nminer`.
+:::
 
-Donde $\mu_{i} = \exp(\beta_{0} + \beta_{1}x_{1i} + ... + \beta_{p}x_{pi})$ y $y_{i}$ es el valor observado de la variable dependiente para la observación $i$.
-
-El objetivo es encontrar los valores de $\beta_{0}, \beta_{1}, ..., \beta_{p}$ que maximizan la función de verosimilitud. Esto se puede hacer utilizando un algoritmo de optimización, como el método de Newton-Raphson.
-
-## Regresión Poisson
-
+:::: {.columns}
+::: {.column width="50%"}
 ```{r}
 #| echo: true
 
-library(GLMsData); data(nminer)
-nm.m1 <- glm( Minerab ~ Eucs, data=nminer, family=poisson)
-printCoefmat(coef(summary(nm.m1)))
+library(GLMsData)
+data(nminer)
+
+nm.m1 <- glm(Minerab ~ Eucs, data=nminer,
+             family=poisson)
+
+summary(nm.m1)
 ```
+:::
+::: {.column width="50%"}
+
+**Ajuste del modelo**
+
+- `glm()`: Ajusta un modelo lineal generalizado.
+- `Minerab ~ Eucs`: Fórmula de la regresión.
+- `data=nminer`: Conjunto de datos.
+- `family=poisson`: Especifica la distribución de la familia de la regresión Poisson.
+:::
+::::
+
+## Regresión Poisson {.smaller}
+
+>**Caso de aplicación**
+
+::: {.notes}
+- **Intercepto:** Representa la media esperada del conteo de mineros ruidosos cuando la variable independiente (`Eucs`) es igual a cero. En este caso, el intercepto es de aproximadamente -0.87, lo cual no tiene una interpretación directa en el conteo de mineros ruidosos.
+
+- **Pendiente:** Representa el cambio en la media del conteo de mineros ruidosos por cada unidad de cambio en la variable independiente (`Eucs`). En este caso, la pendiente es de aproximadamente 0.11, lo cual indica que por cada unidad adicional de eucaliptos, se espera un incremento del 11% en el conteo de mineros ruidosos.
+
+ A través del test de wald, se puede determinar que ambos coeficientes son significativos, con un nivel de confianza del 95%.
+
+:::
+
+:::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| echo: true
+
+library(GLMsData)
+data(nminer)
+
+nm.m1 <- glm(Minerab ~ Eucs, data=nminer,
+             family=poisson)
+
+summary(nm.m1)
+```
+:::
+::: {.column width="50%"}
+
+**Coeficientes**
+
+- **Intercepto:** Representa la media esperada del conteo de mineros ruidosos (`Minerab`) cuando la variable independiente (`Eucs`) es igual a cero.
+- **Pendiente:** Representa el cambio en la media del conteo de mineros ruidosos (`Minerab`) por cada unidad de cambio en la variable independiente (`Eucs`).
+:::
+::::
+
+## Regresión Poisson {.smaller}
+
+>**Caso de aplicación**
+
+::: {.notes}
+Se utiliza para evaluar la bondad de ajuste del modelo. A menudo, se compara el modelo ajustado con un modelo nulo, que es un modelo sin variables independientes. En este caso, el valor de la prueba de bondad de es significativo, lo cual indica que el modelo ajustado es significativamente diferente del modelo nulo.
+:::
+
+:::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| echo: true
+
+library(GLMsData)
+data(nminer)
+
+anova(nm.m1, test="Chisq")
+```
+:::
+::: {.column width="50%"}
+
+**Bondad de ajuste**
+
+El argumento `test="Chisq"` en la función `anova()` se utiliza para realizar una prueba de bondad de ajuste del modelo. En este caso, el valor de la prueba de bondad es significativo.
+:::
+::::
+
 
 ## Regresión Poisson
 
-```{r fig.width=10, fig.height=8}
+::: {.notes}
+A continuación un diagnóstico gráfico del modelo de regresión Poisson ajustado a los datos de `nminer`, en cuanto a la correcta elección de la familia de distribución y la relevancia de las observaciones en el modelo.
+
+La gráfica Q-Q se suele utilizar para determinar si la elección de la distribución de Poisson es apropiada para los datos. En este caso, la gráfica Q-Q muestra que los residuos de los cuantiles siguen una distribución aproximadamente normal, lo cual indica que la elección de la distribución de Poisson es apropiada para los datos.
+
+De otro lado, la gráfica de residuos frente a los valores ajustados muestra que los residuos no tienen una relación clara con los valores ajustados, lo cual confirma, lo ya dicho acerca de la pertinencia del modelo.
+
+La gráfica de la distancia de Cook se utiliza para identificar observaciones influyentes en el modelo. En este caso, la gráfica de la distancia de Cook muestra que la observación 17 tiene una influencia significativa en el modelo. Por lo tanto, esta observación puede tener un impacto significativo en los resultados del mismo. 
+
+La gráfica de "hat values" (o valores sombrero) se utiliza para identificar la influencia que tiene cada observación en la predicción de su propio valor ajustado. En este caso, la observación 11 tiene un valor sombrero significativamente mayor que las demás observaciones, lo cual indica que esta observación tiene una influencia significativa en la predicción de su propio valor ajustado.
+
+En resumen la observación 11 (Cuadrado relleno) tiene un valor sombrero significativamente mayor que las demás observaciones, pero su residuo es pequeño y, por lo tanto, no es influyente. La observación 7 (Circulo relleno) tiene un residuo grande, pero su valor sombrero es pequeño y, por lo tanto, no es influyente. La observación 17 (Triangulo relleno) tiene un valor sombrero y un residuo razonablemente grande, por lo tanto es influyente. 
+:::
+
+```{r fig.width=8, fig.height=6}
 #| echo: false
 #| fig.align: center
 
@@ -186,137 +303,136 @@ maxqr <- which.max(abs(qr))
 maxinfl <- which.max(cooks.distance(nm.m1))
 
 par(mfrow=c(2,2))
-qqnorm(qr, las=1); qqline(qr)
+
+qqnorm(qr, las=1)
+qqline(qr)
 theoretical_quantiles <- qnorm((1:length(qr) - 0.5) / length(qr))
 sample_quantiles <- sort(qr)
-points(theoretical_quantiles[maxhat], sample_quantiles[maxhat], col="red", pch=19)
-points(theoretical_quantiles[maxqr], sample_quantiles[maxqr], col="blue", pch=19)
 
+points(theoretical_quantiles[which(sample_quantiles == qr[maxqr])], qr[maxqr], pch=19, cex=1.5)
+points(theoretical_quantiles[which(sample_quantiles == qr[maxhat])], qr[maxhat], pch=15, cex=1.5)
+points(theoretical_quantiles[which(sample_quantiles == qr[maxinfl])], qr[maxinfl], pch=17, cex=1.5)
+legend("topleft", legend=c("High leverage", "Large residual", "Influential"),
+ pch=c(15, 19, 17), cex=0.8)
 
 plot( qr ~ sqrt(fitted(nm.m1)), las=1)
-points(sqrt(fitted(nm.m1))[maxqr], qr[maxqr], pch=19, cex=2)
-points(sqrt(fitted(nm.m1)[maxhat]), qr[maxhat], pch=15, cex=2)
-points(sqrt(fitted(nm.m1)[maxinfl]), qr[maxinfl], pch=17, cex=2)
+points(sqrt(fitted(nm.m1))[maxqr], qr[maxqr], pch=19, cex=1.5)
+points(sqrt(fitted(nm.m1)[maxhat]), qr[maxhat], pch=15, cex=1.5)
+points(sqrt(fitted(nm.m1)[maxinfl]), qr[maxinfl], pch=17, cex=1.5)
+title("Quantile residuals vs Fitted Values \n(on const. inf. scale)")
+
 
 plot(cooks.distance(nm.m1), type="h", las=1)
-points(maxqr, cooks.distance(nm.m1)[maxqr], pch=19, cex=2)
-points(maxhat, cooks.distance(nm.m1)[maxhat], pch=15, cex=2)
-points(maxinfl, cooks.distance(nm.m1)[maxinfl], pch=17, cex=2)
+points(maxqr, cooks.distance(nm.m1)[maxqr], pch=19, cex=1.5)
+points(maxhat, cooks.distance(nm.m1)[maxhat], pch=15, cex=1.5)
+points(maxinfl, cooks.distance(nm.m1)[maxinfl], pch=17, cex=1.5)
+# umbral
+abline(h=4/length(nm.m1$coefficients), col="red", lty=2)
+title("Cook's distance")
 
 plot(hatvalues(nm.m1), type="h", las=1)
-points(maxqr, hatvalues(nm.m1)[maxqr], pch=19, cex=2)
-points(maxhat, hatvalues(nm.m1)[maxhat], pch=15, cex=2)
-points(maxinfl, hatvalues(nm.m1)[maxinfl], pch=17, cex=2)
+points(maxqr, hatvalues(nm.m1)[maxqr], pch=19, cex=1.5)
+points(maxhat, hatvalues(nm.m1)[maxhat], pch=15, cex=1.5)
+points(maxinfl, hatvalues(nm.m1)[maxinfl], pch=17, cex=1.5)
+title("Hat values")
 ```
 
-## Ejemplo {.smaller}
+## Regresión Poisson {.smaller}
 
 ::: {.notes}
-El conjunto de datos `lungcap`, del paquete `GLMsData`, explora la relación entre la capacidad pulmonar (medida a través del Volumen Respiratorio Forzado, FEV por sus siglas en inglés, en litros), la edad, altura y genero de 654 estudiantes del Este de Boston que fumaron y no durante mediados y finales de la década de 1970.
+maxhat <- Observación con mayor influecia en la predicción de su propio valor ajustado
+maxqr <-Observación con mayor residuo cuantílico
+maxinfl <- Observación con mayor influencia a través de la distancia de Cook
+
+Estos resultados sugieren que los dos transectos con mayor número de eucaliptos son importantes para la comprensión de los datos. Aún cuando el deviance del modelo omitiendo la observación 17 es menor que el deviance del modelo original, la observación 17 tiene una influencia significativa en el modelo. Esto se observa a través de la línea de valores predichos en la gráfica de dispersión de los datos, donde la observación 17 se encuentra en el extremo superior de la línea de valores predichos.
 :::
 
+>**Caso de aplicación**
+
+:::: {.columns}
+::: {.column width="50%"}
+```{r fig.width=6.4, fig.height=5}
+#| echo: false
+ nm.m2 <- glm(Minerab ~ Eucs,
+              family=poisson, data=nminer,
+              subset=(-maxinfl))
+
+plot( Minerab ~ jitter(Eucs), data=nminer,
+ xlab="Number of eucalypts", ylab="Number of noisy miners")
+
+newE <- seq( 0, 35, length=100)
+newM1 <- predict( nm.m1, newdata=data.frame(Eucs=newE), type="response")
+newM2 <- predict( nm.m2, newdata=data.frame(Eucs=newE), type="response")
+lines( newM1 ~ newE, lty=1); lines( newM2 ~ newE, lty=2)
+points( nminer$Eucs[maxinfl], nminer$Minerab[maxinfl], pch=17, cex=1.5)
+points( nminer$Eucs[maxqr], nminer$Minerab[maxqr], pch=19, cex=1.5)
+points( nminer$Eucs[maxhat], nminer$Minerab[maxhat], pch=15, cex=1.5)
+legend("topleft", legend=c("High leverage", "Large residual", "Influential"), pch=c(15, 19, 17))
+legend("top", legend=c("Original model", "Omitting influential obs."), lty=c(1, 2))
+```
+:::
+::: {.column width="50%"}
 ```{r}
 #| echo: true
 
-library(GLMsData)
-data(lungcap)
-head(lungcap)
-str(lungcap)
-summary(lungcap)
+ nm.m2 <- glm(Minerab ~ Eucs,
+              family=poisson, data=nminer,
+              subset=(-maxinfl))
 
-lungcap$Smoke <- factor(lungcap$Smoke, levels = c(0, 1), labels = c("Non-smoker", "Smoker"))
-summary(lungcap$Smoke)
+summary(nm.m2)$coefficients
+
+summary(nm.m1)$coefficients
+
+deviance(nm.m1)
+deviance(nm.m2)
 ```
-
-----
-
-```{r fig.width=10, fig.height=8}
-#| echo: false
-#| fig-align: center
-
-par(mfrow=c(2,2))
-
-plot( FEV ~ Age, data=lungcap,
- xlab="Age (in years)",
- ylab="FEV (in L)",
- main="FEV vs age",
- xlim=c(0, 20),
- ylim=c(0, 6),
- las=1)
-
- plot( FEV ~ Ht, data=lungcap, main="FEV vs height",
- xlab="Height (in inches)", ylab="FEV (in L)",
- las=1, ylim=c(0, 6) )
-
- plot( FEV ~ Gender, data=lungcap,
- main="FEV vs gender", ylab="FEV (in L)",
- las=1, ylim=c(0, 6))
-
- plot( FEV ~ Smoke, data=lungcap, main="FEV vs Smoking status",
- ylab="FEV (in L)", xlab="Smoking status",
- las=1, ylim=c(0, 6))
-```
-
-----
-```{r fig.width=10, fig.height=8}
-#| echo: false
-#| fig-align: center
-
-par(mfrow=c(2,2))
-
-plot(FEV~Age,
- data=subset(lungcap,Smoke=="Smoker"), # Onlyselectsmokers
- main="FEVvsage\nforsmokers", # \nmeans`newline'
- ylab="FEV(inL)",xlab="Age(inyears)",
- ylim=c(0,6),xlim=c(0,20),las=1)
-
-plot(FEV~Age,
- data=subset(lungcap,Smoke=="Non-smoker"), #Onlyselectnon-smokers
- main="FEVvsage\nfornon-smokers",
- ylab="FEV(inL)",xlab="Age(inyears)",
- ylim=c(0,6),xlim=c(0,20),las=1)
-
-plot(FEV~Ht,data=subset(lungcap,Smoke=="Smoker"),
- main="FEVvsheight\nforsmokers",
- ylab="FEV(inL)",xlab="Height(ininches)",
- xlim=c(45,75),ylim=c(0,6),las=1)
-
-plot(FEV~Ht,data=subset(lungcap,Smoke=="Non-smoker"),
- main="FEVvsheight\nfornon-smokers",
- ylab="FEV(inL)", xlab="Height(ininches)",
- xlim=c(45,75),ylim=c(0,6),las=1)
-```
-
-----
-```{r fig.width=10, fig.height=8}
-#| echo: false
-#| fig-align: center
-
-AgeAdjust <- lungcap$Age + ifelse(lungcap$Smoke=="Smoker", 0, 0.5)
-
-par(mfrow=c(2,2))
-
-plot( FEV ~ AgeAdjust, data=lungcap,
- pch = ifelse(Smoke=="Smoker", 3, 20),
- xlab="Age (in years)", ylab="FEV (in L)", main="FEV vs age", las=1)
-legend("topleft", pch=c(20, 3), legend=c("Non-smokers","Smokers") )
-
-boxplot(lungcap$FEV ~ lungcap$Smoke + lungcap$Gender,
- ylab="FEV (in L)", main="FEV, by gender\n and smoking status",
- xlab="",
- las=2,
- # Keeps labels perpendicular to the axes
- names=c("F:\nNon", "F:\nSmoker", "M:\nNon", "M:\nSmoker"))
+:::
+::::
 
 
-interaction.plot( lungcap$Smoke, lungcap$Gender, lungcap$FEV,
- xlab="Smoking status", ylab="FEV (in L)",
- main="Mean FEV, by gender\n and smoking status",
- trace.label="Gender", las=1)
+## Conclusiones {.smaller}
 
-interaction.plot( lungcap$Smoke, lungcap$Gender, lungcap$Age,
- xlab="Smoking status", ylab="Age (in years)",
- main="Mean age, by gender\n and smoking status",
- trace.label="Gender", las=1)
-```
+::: {.notes}
+1. Los modelos de regresión Poisson son una herramienta útil para modelar variables de conteo.
 
+- En este caso, se utilizó un modelo de regresión Poisson para modelar la relación entre la abundancia de mineros ruidosos y la cantidad de eucaliptos en un bosque.
+- El modelo ajustado mostró una buena bondad de ajuste y los coeficientes de regresión fueron significativos.
+- Esto indica que existe una relación positiva entre la abundancia de mineros ruidosos y la cantidad de eucaliptos.
+
+2. Es importante realizar un diagnóstico gráfico del modelo para evaluar la bondad de ajuste y la presencia de observaciones influyentes.
+
+- En este caso, el diagnóstico gráfico mostró que la elección de la distribución de Poisson era apropiada y que no había observaciones con una influencia significativa en el modelo.
+- Sin embargo, se identificó una observación que tenía un valor sombrero y un residuo razonablemente grande, por lo que se reajustó el modelo excluyendo esta observación.
+
+3. La interpretación de los coeficientes de regresión en los modelos de regresión Poisson debe hacerse con precaución.
+
+- El intercepto no tiene una interpretación directa en el conteo de mineros ruidosos.
+- La pendiente representa el cambio en la media del conteo de mineros ruidosos por cada unidad de cambio en la variable independiente (Eucs).
+- En este caso, la pendiente fue de 0.11, lo que indica que por cada unidad adicional de eucaliptos, se espera un incremento del 11% en el conteo de mineros ruidosos.
+
+4. Los modelos de regresión Poisson se pueden utilizar para hacer predicciones sobre el valor de la variable de respuesta para nuevos valores de la variable independiente.
+
+- En este caso, se utilizaron los modelos ajustados para predecir la abundancia de mineros ruidosos en nuevos transectos con diferentes cantidades de eucaliptos.
+
+5. Es importante tener en cuenta las limitaciones de los modelos de regresión Poisson al interpretarlos y utilizarlos para hacer predicciones.
+
+- Los modelos de regresión Poisson asumen que la variable de respuesta sigue una distribución de Poisson.
+- Esta suposición puede no ser válida en todos los casos.
+- Es importante verificar la validez de esta suposición antes de ajustar un modelo de regresión Poisson.
+:::
+
+<br>
+
+- Los modelos de regresión Poisson son una extensión de los modelos lineales generalizados que se utilizan para modelar variables de conteo.
+
+- La interpretación de los coeficientes de regresión en los modelos de regresión Poisson debe hacerse con precaución.
+
+- Es importante realizar un diagnóstico gráfico del modelo para evaluar la bondad de ajuste y la presencia de observaciones influyentes.
+
+- Los modelos de regresión Poisson se pueden utilizar para hacer predicciones sobre el valor de la variable de respuesta para nuevos valores de la variable independiente.
+
+## Referencias {.smaller}
+
+<br>
+
+- Dunn, P. K., & Smyth, G. K. (2018). Generalized linear models with examples in R. Springer.
