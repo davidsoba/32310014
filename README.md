@@ -17,6 +17,9 @@ Entregas para la clase de Análisis Avanzado de Datos de la Maestría en Matemá
 |   ├── referencias.bib       <- Referencias
 |   ├── taller.Rmd            <- Material en formato RMarkdown
 |   ├── taller.html           <- Material en formato HTML
+├── E04                    <- Material de la entrega final
+|   ├── slides.qmd            <- Material en formato Quarto
+|   ├── slides.html           <- Material en formato HTML
 ├── .gitignore             <- Archivos que no serán rastreados en Git
 ├── 32310014.Rproj         <- Archivo de proyecto de RStudio
 ```
