@@ -429,7 +429,7 @@
 <aside class="notes">
 <p>Antes de entrar a hablar de que son los Modelos Lineales Generalizados, es importante mencionar qué es un modelo de Regresión Lineal y de qué está compuesto. En terminos generales, un modelo estadístico consta de un <strong>componente aleatorio</strong> y un <strong>componente sistemático</strong>. El componente aleatorio se refiere a la variabilidad en los datos, mientras que el componente sistemático se refiere a la relación entre las variables independientes y la variable dependiente.</p>
 <p>En los terminos de la notación utilizada por Dunn y Smyth (2018) en su libro <em>“Generalized Linear Models with Examples in R”</em>, el <strong>componente sistemático</strong> en estos modelos, asume que el valor esperado de la variable dependiente depende de p variables independientes a través de una función f con una serie de parámetros de regresión. Donde la media en la i-ésima observación de la combinación lineal de estos párametros es igual a la i-ésima observación de la variable dependiente.</p>
-<p>Por otro lado, el <strong>componente aleatorio</strong> asume que, en la i-ésima observación, la variable dependiente sigue una distribución normal con media y varianza constante.</p>
+<p>Por otro lado, el <strong>componente aleatorio</strong> asume que, en la i-ésima observación, la variable dependiente sigue una distribución normal con media y varianza constante. En otras palabras se asume que las respuestas se distribuyen normalmente alrededor de la media con una varianza constante. Para los modelos lineales, la función <span class="math inline">\(f\)</span> es la función identidad, <span class="math inline">\(f(x) = x\)</span>. Para los modelos no lineales, la función <span class="math inline">\(f\)</span> puede ser cualquier función no lineal.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -445,20 +445,6 @@
 <p><span class="math display">\[E[y_{i}] = \mu_{i} = f(\beta_{0} + \beta_{1}x_{1i} + ... + \beta_{p}x_{pi})\]</span></p>
 <p>Mientras que el <strong>componente aleatorio</strong> asume que la variable dependiente <span class="math inline">\(y_{i}\)</span> sigue una distribución normal con media <span class="math inline">\(\mu_{i}\)</span> y varianza constante <span class="math inline">\(\sigma^{2}\)</span>:</p>
 <p><span class="math display">\[y_{i} \sim N(\mu_{i}, \sigma^{2})\]</span></p>
-<aside class="notes">
-<p>El componente aleatorio para la regresión lineal asume que la varianza de las respuestas, o la variable dependiente en la i-ésima observación, es constante cerca de la media. En otras palabras se asume que las respuestas se distribuyen normalmente alrededor de la media con una varianza constante.</p>
-<p>Para los modelos lineales, la función <span class="math inline">\(f\)</span> es la función identidad, <span class="math inline">\(f(x) = x\)</span>. Para los modelos no lineales, la función <span class="math inline">\(f\)</span> puede ser cualquier función no lineal.</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
 </section>
 <section id="modelos-lineales-generalizados" class="slide level2 smaller">
 <h2>Modelos Lineales Generalizados</h2>
@@ -484,25 +470,7 @@
 <p>o alternativamente:</p>
 <p><span class="math display">\[E[y_{i}] = g(\mu_{i}) = \beta_{0} + \beta_{1}x_{1i} + ... + \beta_{p}x_{pi}\]</span></p>
 <p>Donde <span class="math inline">\(g()\)</span> es llamada <em>link function</em>. Que es una función monotónica y diferenciable (como una función logarítmica).</p>
-<p>El <strong>componente aleatorio</strong> se explica asumiendo que la variable dependiente <span class="math inline">\(y_{i}\)</span> sigue una distribución de una familia específica de distribuciones de probabilidad, llamadas Modelos de Dispersión Exponencial (EDM, por sus siglas en inglés), que incluye distribuciones comunes como la normal, Poisson y el binomio como casos especiales.</p>
-<aside class="notes">
-<ul>
-<li>La regresión Poisson es un modelo lineal generalizado que se utiliza para modelar variables de conteo.</li>
-<li>La regresión Poisson es una extensión de la regresión lineal.</li>
-<li>La regresión Poisson se utiliza cuando la variable dependiente es un conteo de eventos.</li>
-<li>La regresión Poisson se utiliza para modelar la relación entre una variable dependiente de conteo y una o más variables independientes.</li>
-</ul>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
+<p>El <strong>componente aleatorio</strong> se explica asumiendo que la variable dependiente <span class="math inline">\(y_{i}\)</span> sigue una distribución de una familia específica de distribuciones de probabilidad, llamadas Modelos de Dispersión Exponencial (EDM, por sus siglas en inglés).</p>
 </section>
 <section id="glms-poisson" class="slide level2 smaller">
 <h2>GLMs Poisson</h2>
@@ -510,8 +478,8 @@
 <p><strong>Caso de aplicación</strong></p>
 </blockquote>
 <aside class="notes">
-<p>Miremos como ejemplo el conjunto de datos <code>nminer</code> del paquete <code>GLMsData</code>, para entender cómo se ajusta un modelo de regresión Poisson y en qué casos se puede utilizar.</p>
-<p>Este conjunto de datos explora la relación entre la abundancia de mineros ruidosos, “un ave nativa australiana pequeña pero peligrosa” y la cantidad de eucaliptos en un bosque. El objetivo del estudio era determinar si la abundancia de mineros ruidosos estaba relacionada con la cantidad de eucaliptos en el bosque.</p>
+<p>Para empezar hablar de los modelos lineales generalizados Poisson, miremos como ejemplo el conjunto de datos <code>nminer</code> del paquete <code>GLMsData</code>, para entender cómo se ajusta un modelo de regresión Poisson y en qué casos se puede utilizar.</p>
+<p>Este conjunto de datos explora la relación entre la abundancia de mineros ruidosos, “un ave nativa australiana pequeña pero peligrosa” y la cantidad de eucaliptos en un bosque. El objetivo de este ejemplo es determinar si la abundancia de mineros ruidosos está relacionada con la cantidad de eucaliptos en el bosque. En la parte izquierda se puede apreciar el conteo de mineros ruidosos en función de la cantidad de eucaliptos en un bosque para las 32 observaciones del conjunto de datos. En la parte derecha se muestra un gráfico de dispersión de los datos, donde se puede observar que la relación entre la cantidad de eucaliptos y la abundancia de mineros ruidosos no parece ser lineal.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -581,8 +549,8 @@
 <p><strong>Caso de aplicación</strong></p>
 </blockquote>
 <aside class="notes">
-<p>Debido a que la respuestas son variables de conteo, una <strong>distribución Poisson</strong> puede ser adecuada para modelar la relación entre la cantidad de eucaliptos y la abundancia de mineros ruidosos. La distribución de esta familia de distribuciones de probabilidad es una distribución de probabilidad discreta que se utiliza para modelar el número de eventos que ocurren en un intervalo de tiempo o espacio fijo.</p>
-<p>La relación entre la media y el número de eucaliptos tampoco parece ser lineal. Así que un posible modelo para el componente sistemático estaría dado por una funcición exponencial.</p>
+<p>Debido a que la respuestas de este ejemplo es una variable de conteo, una <strong>distribución Poisson</strong> puede ser adecuada para modelar la relación entre la cantidad de eucaliptos y la abundancia de mineros ruidosos. La distribución de esta familia de modelos de dispersión exponencial se utiliza para modelar el número de eventos que ocurren en un intervalo de tiempo o espacio fijo.</p>
+<p>De otro lado, La relación entre la media y el número de eucaliptos tampoco parece ser lineal. Así que un posible modelo para el componente sistemático estaría dado por una funcición exponencial, la cual garantiza que la media sea mayor a cero, lo que a su vez permite, como lo veremos más adelante, la interpretación de efectos multiplicadores en los parámetros de regresión.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -607,7 +575,7 @@
 <p><strong>Teoría</strong></p>
 </blockquote>
 <aside class="notes">
-<p>La función de enlace más comunmente utilizada para los modelos lineales generalizados de Poisson es la función logarítmica, la cual garantiza que la media sea mayor a cero lo cual permite la interpretación de efectos multiplicadores en los parámetros de regresión. Esto facilita la interpretación de los coeficientes de regresión, ya que representan la razón de cambio en la media por cada unidad de cambio en el predictor correspondiente.</p>
+<p>Ya hemos dicho que el componente aleatorio de los modelos lineales generalizados de Poisson siguen una distribución de su misma familia y que el componente aleatorio se puede expresar como una función exponencial. Ahora bien, la función de enlace más comunmente utilizada para los modelos lineales generalizados de Poisson es la función logarítmica, la cual garantiza que la media sea mayor a cero. Esto facilita la interpretación de los coeficientes de regresión, ya que representan la razón de cambio en la media por cada unidad de cambio en el predictor correspondiente.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -632,6 +600,7 @@
 <p><strong>Teoría</strong></p>
 </blockquote>
 <aside class="notes">
+<p>En cuanto a la forma de las variables dependientes e independientes en los modelos de regresión Poisson, es importante tener en cuenta que la variable dependiente debe ser una variable de conteo, mientras que las variables independientes pueden ser cualitativas, cuantitativas o una mezcla de ambas.</p>
 <p>Cuando todas las variables independientes son cualitativas, es apropiado resumir los datos en una tabla de contingencia. En este caso, el modelo se denomina modelo de <strong>log-odds lineal</strong> o <strong>modelo de log-lineal</strong>, no modelo logarítmico lineal. La distinción radica en que el modelo relaciona el logaritmo de la razón de odds con las variables predictoras, no directamente las variables en sí.</p>
 <p>Si alguna variable independiente es cuantitativa, el modelo sigue denominándose <strong>modelo de regresión de Poisson</strong>. La presencia de variables cuantitativas no altera la naturaleza fundamental del modelo.</p>
 <p>Cuando hay una mezcla de variables cualitativas y cuantitativas como variables independientes, se puede utilizar un <strong>modelo lineal generalizado de Poisson (GLM-Poisson)</strong>. Este modelo amplía el modelo de regresión de Poisson básico para acomodar diferentes tipos de variables predictoras.</p>
@@ -658,7 +627,7 @@
 <p><strong>Caso de aplicación</strong></p>
 </blockquote>
 <aside class="notes">
-<p>La aplicación en R de la regresión Poisson se puede realizar a través de la función <code>glm()</code> del paquete <code>stats</code>. A continuación se muestra un ejemplo de cómo ajustar un modelo de regresión Poisson a los datos de <code>nminer</code>.</p>
+<p>Sigamos explorando el conjunto de datos <code>nminer</code> para ajustar un modelo de regresión Poisson a los datos y evaluar la relación entre la abundancia de mineros ruidosos y la cantidad de eucaliptos en un bosque. En este caso, se ajustará un modelo de regresión Poisson utilizando la función <code>glm()</code> del paquete <code>stats</code>. Esta función ajusta un modelo lineal generalizado a los datos y permite especificar la distribución de la familia de la regresión, en este caso, la distribución de Poisson.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -718,11 +687,11 @@ Number of Fisher Scoring iterations: 5</code></pre>
 <p><strong>Caso de aplicación</strong></p>
 </blockquote>
 <aside class="notes">
+<p>En cuanto a los coeficientes del modelo, se puede observar que el intercepto y la pendiente son significativos, con un nivel de confianza del 95%. En este caso la interpertación de estos coefientes estará dada de la siguiente manera:</p>
 <ul>
 <li><p><strong>Intercepto:</strong> Representa la media esperada del conteo de mineros ruidosos cuando la variable independiente (<code>Eucs</code>) es igual a cero. En este caso, el intercepto es de aproximadamente -0.87, lo cual no tiene una interpretación directa en el conteo de mineros ruidosos.</p></li>
 <li><p><strong>Pendiente:</strong> Representa el cambio en la media del conteo de mineros ruidosos por cada unidad de cambio en la variable independiente (<code>Eucs</code>). En este caso, la pendiente es de aproximadamente 0.11, lo cual indica que por cada unidad adicional de eucaliptos, se espera un incremento del 11% en el conteo de mineros ruidosos.</p></li>
 </ul>
-<p>A través del test de wald, se puede determinar que ambos coeficientes son significativos, con un nivel de confianza del 95%.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -780,7 +749,7 @@ Number of Fisher Scoring iterations: 5</code></pre>
 <p><strong>Caso de aplicación</strong></p>
 </blockquote>
 <aside class="notes">
-<p>Se utiliza para evaluar la bondad de ajuste del modelo. A menudo, se compara el modelo ajustado con un modelo nulo, que es un modelo sin variables independientes. En este caso, el valor de la prueba de bondad de es significativo, lo cual indica que el modelo ajustado es significativamente diferente del modelo nulo.</p>
+<p>En cuanto a la bondad de ajuste del modelo, se puede observar que el valor de la prueba de bondad de ajuste es significativo, lo cual indica que el modelo ajustado es significativamente diferente del modelo nulo. Lo cual indica que la cantidad de eucaliptos es un predictor significativo de la abundancia de mineros ruidosos en el bosque. Para evaluar la bondad de ajuste del modelo, se puede utilizar la función <code>anova()</code> con el argumento <code>test="Chisq"</code>, donde chisq es el estadístico de prueba de la bondad de ajuste.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -824,12 +793,13 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <section id="regresión-poisson-3" class="slide level2">
 <h2>Regresión Poisson</h2>
 <aside class="notes">
-<p>A continuación un diagnóstico gráfico del modelo de regresión Poisson ajustado a los datos de <code>nminer</code>, en cuanto a la correcta elección de la familia de distribución y la relevancia de las observaciones en el modelo.</p>
-<p>La gráfica Q-Q se suele utilizar para determinar si la elección de la distribución de Poisson es apropiada para los datos. En este caso, la gráfica Q-Q muestra que los residuos de los cuantiles siguen una distribución aproximadamente normal, lo cual indica que la elección de la distribución de Poisson es apropiada para los datos.</p>
-<p>De otro lado, la gráfica de residuos frente a los valores ajustados muestra que los residuos no tienen una relación clara con los valores ajustados, lo cual confirma, lo ya dicho acerca de la pertinencia del modelo.</p>
-<p>La gráfica de la distancia de Cook se utiliza para identificar observaciones influyentes en el modelo. En este caso, la gráfica de la distancia de Cook muestra que la observación 17 tiene una influencia significativa en el modelo. Por lo tanto, esta observación puede tener un impacto significativo en los resultados del mismo.</p>
-<p>La gráfica de “hat values” (o valores sombrero) se utiliza para identificar la influencia que tiene cada observación en la predicción de su propio valor ajustado. En este caso, la observación 11 tiene un valor sombrero significativamente mayor que las demás observaciones, lo cual indica que esta observación tiene una influencia significativa en la predicción de su propio valor ajustado.</p>
-<p>En resumen la observación 11 (Cuadrado relleno) tiene un valor sombrero significativamente mayor que las demás observaciones, pero su residuo es pequeño y, por lo tanto, no es influyente. La observación 7 (Circulo relleno) tiene un residuo grande, pero su valor sombrero es pequeño y, por lo tanto, no es influyente. La observación 17 (Triangulo relleno) tiene un valor sombrero y un residuo razonablemente grande, por lo tanto es influyente.</p>
+<p>Ahora bien, es importante evaluar el modelo ajustado a través de un diagnóstico gráfico para verificar la bondad de ajuste del modelo y la presencia de observaciones influyentes. En este caso, se utilizarán gráficos de diagnóstico para evaluar la elección de la distribución de Poisson, la relevancia de las observaciones en el modelo y la influencia de las observaciones predichas de su propio valor ajustado.</p>
+<p>La gráfica Q-Q se suele utilizar para determinar si la elección de la distribución de Poisson es apropiada para los datos. En este caso, la gráfica muestra que los residuos de los cuantiles siguen una distribución aproximadamente normal, lo cual indica que la elección de la distribución de Poisson es apropiada para los datos.</p>
+<p>De otro lado, la gráfica de residuos frente a los valores ajustados muestra que los residuos no tienen una relación clara con los valores ajustados, lo cual confirma, lo ya dicho acerca de la pertinencia de la distribución del modelo.</p>
+<p>La gráfica de la distancia de Cook se utiliza para identificar observaciones influyentes en el modelo. En este caso, la gráfica muestra que la observación 17 (denotada con un triangulo relleno) tiene una influencia significativa en el modelo. Por lo tanto, esta observación puede tener un impacto significativo en los resultados del mismo.</p>
+<p>La gráfica de <em>hat values</em> (o valores sombrero) se utiliza para identificar la influencia que tiene cada observación en la predicción de su propio valor ajustado. En este caso, la observación 11 (denotada con un cuadrado relleno) tiene un valor sombrero significativamente mayor que las demás observaciones, lo cual indica que esta observación tiene una influencia significativa en la predicción de su propio valor ajustado.</p>
+<p>En resumen la observación 11 (denotada con un Cuadrado relleno) tiene un valor sombrero significativamente mayor que las demás observaciones, pero su residuo es pequeño y, por lo tanto, no es influyente. La observación 7 (denotada con un circulo relleno) tiene un residuo grande, pero su valor sombrero es pequeño y, por lo tanto, no es influyente. Mientras que la observación 17 (denotada con un Triangulo relleno) tiene un valor sombrero y un residuo razonablemente grande, por lo tanto es influyente.</p>
+<p>Ahora observemos que puede pasar si ajustamos un modelo de regresión Poisson excluyendo esta observación influyente.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -846,8 +816,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <section id="regresión-poisson-4" class="slide level2 smaller">
 <h2>Regresión Poisson</h2>
 <aside class="notes">
-<p>maxhat &lt;- Observación con mayor influecia en la predicción de su propio valor ajustado maxqr &lt;-Observación con mayor residuo cuantílico maxinfl &lt;- Observación con mayor influencia a través de la distancia de Cook</p>
-<p>Estos resultados sugieren que los dos transectos con mayor número de eucaliptos son importantes para la comprensión de los datos. Aún cuando el deviance del modelo omitiendo la observación 17 es menor que el deviance del modelo original, la observación 17 tiene una influencia significativa en el modelo. Esto se observa a través de la línea de valores predichos en la gráfica de dispersión de los datos, donde la observación 17 se encuentra en el extremo superior de la línea de valores predichos.</p>
+<p>Los resultados en el ajuste del modelo exluyendo la observación (denotada en la gráfica con un triangulo relleno) muestran que el intercepto y la pendiente siguen siendo significativos, con un nivel de confianza del 95% y una bondad de ajuste menor, en comparación con el modelo original, en los terminos de la desviación a través de la métrica <em>deviance</em>. En este caso, la observación 17 tiene una influencia significativa en el modelo, lo cual se observa a través de la línea de valores predichos (denotada por la linea de regresión continua) en la gráfica de dispersión de los datos. Esto demuestra que muchas de los valores que podemos considerar como atípicos, pueden tener un impacto significativo en el modelo ajustado.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -887,13 +856,13 @@ Eucs         0.1247156 0.01331536  9.366299 7.512065e-21</code></pre>
 (Intercept) -0.8762114 0.28279293 -3.098421 1.945551e-03
 Eucs         0.1139813 0.01243104  9.169092 4.770189e-20</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="fu">deviance</span>(nm.m1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 63.31798</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">deviance</span>(nm.m2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="fu">deviance</span>(nm.m2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 59.14028</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">deviance</span>(nm.m1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 63.31798</code></pre>
 </div>
 </div>
 </div>
@@ -902,43 +871,12 @@ Eucs         0.1139813 0.01243104  9.169092 4.770189e-20</code></pre>
 <section id="conclusiones" class="slide level2 smaller">
 <h2>Conclusiones</h2>
 <aside class="notes">
-<ol type="1">
-<li>Los modelos de regresión Poisson son una herramienta útil para modelar variables de conteo.</li>
-</ol>
-<ul>
-<li>En este caso, se utilizó un modelo de regresión Poisson para modelar la relación entre la abundancia de mineros ruidosos y la cantidad de eucaliptos en un bosque.</li>
-<li>El modelo ajustado mostró una buena bondad de ajuste y los coeficientes de regresión fueron significativos.</li>
-<li>Esto indica que existe una relación positiva entre la abundancia de mineros ruidosos y la cantidad de eucaliptos.</li>
-</ul>
-<ol start="2" type="1">
-<li>Es importante realizar un diagnóstico gráfico del modelo para evaluar la bondad de ajuste y la presencia de observaciones influyentes.</li>
-</ol>
-<ul>
-<li>En este caso, el diagnóstico gráfico mostró que la elección de la distribución de Poisson era apropiada y que no había observaciones con una influencia significativa en el modelo.</li>
-<li>Sin embargo, se identificó una observación que tenía un valor sombrero y un residuo razonablemente grande, por lo que se reajustó el modelo excluyendo esta observación.</li>
-</ul>
-<ol start="3" type="1">
-<li>La interpretación de los coeficientes de regresión en los modelos de regresión Poisson debe hacerse con precaución.</li>
-</ol>
-<ul>
-<li>El intercepto no tiene una interpretación directa en el conteo de mineros ruidosos.</li>
-<li>La pendiente representa el cambio en la media del conteo de mineros ruidosos por cada unidad de cambio en la variable independiente (Eucs).</li>
-<li>En este caso, la pendiente fue de 0.11, lo que indica que por cada unidad adicional de eucaliptos, se espera un incremento del 11% en el conteo de mineros ruidosos.</li>
-</ul>
-<ol start="4" type="1">
-<li>Los modelos de regresión Poisson se pueden utilizar para hacer predicciones sobre el valor de la variable de respuesta para nuevos valores de la variable independiente.</li>
-</ol>
-<ul>
-<li>En este caso, se utilizaron los modelos ajustados para predecir la abundancia de mineros ruidosos en nuevos transectos con diferentes cantidades de eucaliptos.</li>
-</ul>
-<ol start="5" type="1">
-<li>Es importante tener en cuenta las limitaciones de los modelos de regresión Poisson al interpretarlos y utilizarlos para hacer predicciones.</li>
-</ol>
-<ul>
-<li>Los modelos de regresión Poisson asumen que la variable de respuesta sigue una distribución de Poisson.</li>
-<li>Esta suposición puede no ser válida en todos los casos.</li>
-<li>Es importante verificar la validez de esta suposición antes de ajustar un modelo de regresión Poisson.</li>
-</ul>
+<p>En resumen, los modelos de regresión Poisson son una herramienta útil para modelar variables de conteo. En este caso, se utilizó un modelo de regresión Poisson para modelar la relación entre la abundancia de mineros ruidosos y la cantidad de eucaliptos en un bosque. El modelo ajustado mostró una buena bondad de ajuste y los coeficientes de regresión fueron significativos. Esto indica que existe una relación positiva entre la abundancia de mineros ruidosos y la cantidad de eucaliptos.</p>
+<p>Es importante realizar un diagnóstico gráfico del modelo para evaluar la bondad de ajuste y la presencia de observaciones influyentes. En este caso, se identificó una observación que tenía un valor sombrero y un residuo razonablemente grande, por lo que se reajustó el modelo excluyendo esta observación.</p>
+<p>La interpretación de los coeficientes de regresión en los modelos de regresión Poisson debe hacerse con precaución. El intercepto no tiene una interpretación directa en el conteo de mineros ruidosos, mientras que la pendiente representa el cambio en la media del conteo de mineros ruidosos por cada unidad de cambio en la variable independiente (Eucs).</p>
+<p>Los modelos de regresión Poisson se pueden utilizar para hacer predicciones sobre el valor de la variable de respuesta para nuevos valores de la variable independiente. En este caso, se utilizaron los modelos ajustados para predecir la abundancia de mineros ruidosos en nuevos transectos con diferentes cantidades de eucaliptos.</p>
+<p>Finalmente, es importante tener en cuenta las limitaciones de los modelos de regresión Poisson al interpretarlos y utilizarlos para hacer predicciones. Es importante verificar la validez de la suposición de la distribución de Poisson antes de ajustar un modelo de regresión de este tipo.</p>
+<p>Eso es todo, muchas gracias.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
